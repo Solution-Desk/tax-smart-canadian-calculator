@@ -36,7 +36,10 @@
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/your-user/canada-tax-smart-calc.git"
+    "url": "https://github.com/solutionsrme/canada-tax-smart-calc.git"
   },
-  "homepage": "https://solutionsrme.github.io/canada-tax-smart-calc/"
+  "homepage": "https://solutionsrme.github.io/canada-tax-smart-calc/",
+  "bugs": {
+    "url": "https://github.com/solutionsrme/canada-tax-smart-calc/issues"
+  }
 }

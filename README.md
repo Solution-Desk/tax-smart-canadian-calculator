@@ -1,26 +1,27 @@
 # Canada Tax Smart Calc
 
-Canada Tax Smart Calc is a modern web app that helps Canadians (and the people who invoice them) combine GST, HST, PST, and Quebec QST in a single, shareable workspace.
+Canada Tax Smart Calc is a modern web app that helps Canadians—and the people who invoice them—combine GST, HST, PST, and Quebec QST in a single, shareable workspace.
 
-## Try it now
+## Quick links
 - **Live calculator:** https://solutionsrme.github.io/canada-tax-smart-calc/
-- **Snapshot sharing:** use the “Share snapshot” button inside the app to generate a link that encodes the current province, categories, and amounts.
+- **Product background:** [`ABOUT.md`](ABOUT.md)
+- **Changelog:** [`CHANGELOG.md`](CHANGELOG.md)
+- **Support:** [`SUPPORT.md`](SUPPORT.md)
+- **Security policy:** [`SECURITY.md`](SECURITY.md)
 
 ## Product at a glance
-- **All provinces covered** - switch between AB and YT and instantly see the right GST/HST/PST/QST mix.
-- **Category intelligence** - restaurant meals, children's goods, books, and more follow CRA and provincial rebates.
-- **Dark-first interface** - sleek default theme with one-tap light mode for print-friendly moments.
-- **Clipboard superpowers** - copy totals or share the base calculator link without leaving the page.
-- **Reference-ready** - built-in links to CRA and provincial bulletins for quick fact checks.
-
-![Screenshot of Canada Tax Smart Calc](docs/screenshot-placeholder.png)
+- **All provinces covered** – swap between AB and YT to see the right GST/HST/PST/QST mix instantly.
+- **Category intelligence** – restaurant meals, children's goods, books, and more follow CRA and provincial rebates.
+- **Dark-first interface** – sleek default theme with a one-click light mode for print-friendly moments.
+- **Clipboard superpowers** – copy totals or share a calculator snapshot without leaving the page.
+- **Reference-ready** – built-in links to CRA and provincial bulletins for quick fact checks.
 
 ## Why teams use it
-- **Retail and hospitality** - quote accurate taxes for bundled goods or meals across provinces.
-- **Accounting and bookkeeping** - review exemptions with clients via shareable URLs instead of PDFs.
-- **E-commerce** - sanity-check storefront tax rules before rollout.
+- **Retail and hospitality** – quote accurate taxes for bundled goods or meals across provinces.
+- **Accounting and bookkeeping** – review exemptions with clients via shareable URLs instead of PDFs.
+- **E-commerce** – sanity-check storefront tax rules before rollout.
 
-## What's on the screen
+## Experience walkthrough
 1. **Province selector** with real-time rate tiles (federal vs. provincial blend).
 2. **Line item grid** to capture label, category, and amount for each entry.
 3. **Totals dashboard** with GST/HST/PST/QST breakdown, total tax, and grand total.
@@ -34,10 +35,15 @@ Canada Tax Smart Calc is a modern web app that helps Canadians (and the people w
 - Dark-mode state and DOM integration are handled by [`src/hooks/useDarkMode.ts`](src/hooks/useDarkMode.ts).
 - The main experience is composed in [`src/components/TaxSmartCalculator`](src/components/TaxSmartCalculator).
 
-More product background, roadmap ideas, and principles: see [`ABOUT.md`](ABOUT.md).
+## Community & governance
+- Follow the contribution process outlined in [`CONTRIBUTING.md`](CONTRIBUTING.md).
+- We enforce the [Code of Conduct](CODE_OF_CONDUCT.md) and will moderate issues, PRs, and discussions accordingly.
+- Questions? Start a topic in [GitHub Discussions](https://github.com/solutionsrme/canada-tax-smart-calc/discussions) or review [`SUPPORT.md`](SUPPORT.md).
+- Vulnerability to report? See [`SECURITY.md`](SECURITY.md) for responsible disclosure guidelines.
+- Release history and planned notes live in [`CHANGELOG.md`](CHANGELOG.md).
 
 ## For developers
-Want to extend or self-host the calculator? Follow these steps.
+Want to extend or self-host the calculator? Follow these steps:
 
 ```bash
 npm install
@@ -51,13 +57,11 @@ npm run build
 ```
 Artifacts land in `dist/`. Use `npm run preview` to sanity-check the static output.
 
-### Contribution guide
+### Contribution checklist
 - Fork the repo and create a feature branch.
 - Keep business logic inside `src/lib`, UI inside `src/components`, and shared concerns as hooks.
-- When updating tax rules, cite CRA or provincial sources in your PR.
-- Run `npm run build` before opening a pull request.
-
-See [`CONTRIBUTING.md`](CONTRIBUTING.md) for more process details and [`CODE_OF_CONDUCT.md`](CODE_OF_CONDUCT.md) for community standards.
+- Cite CRA or provincial sources in PRs when you update tax rules.
+- Run `npm run build` before opening a pull request and fill in the PR template.
 
 ## Deployment
 GitHub Actions builds and deploys to GitHub Pages whenever `main` is updated.
@@ -69,4 +73,5 @@ GitHub Actions builds and deploys to GitHub Pages whenever `main` is updated.
 Other static hosts (Netlify, Vercel, Cloudflare Pages, etc.) can deploy the `dist/` directory without extra configuration.
 
 ## License
-MIT License - full text in [`LICENSE`](LICENSE).
+MIT License – full text in [`LICENSE`](LICENSE).
+

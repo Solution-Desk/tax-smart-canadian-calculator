@@ -1,0 +1,57 @@
+name: Bug report
+about: Help us squash bugs by sharing reproduction steps and context.
+labels: [bug]
+assignees: []
+
+title: "[Bug]: "
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to tell us about a problem.
+  - type: textarea
+    id: summary
+    attributes:
+      label: Summary
+      description: What went wrong? Give a quick overview.
+      placeholder: The calculator crashed when...
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Steps to reproduce
+      description: Share the steps that triggered the bug. Include sample input amounts if relevant.
+      placeholder: |
+        1. Go to province...
+        2. Add line item category...
+        3. Click...
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behaviour
+      description: What did you expect to happen instead?
+    validations:
+      required: true
+  - type: textarea
+    id: screenshots
+    attributes:
+      label: Screenshots or recordings
+      description: Drag & drop images, GIFs, or short videos that show the issue.
+  - type: input
+    id: version
+    attributes:
+      label: App version / commit
+      description: Link to the commit, release tag, or describe the deployment environment.
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment
+      description: Browser, OS, device, screen size, etc.
+  - type: textarea
+    id: extra
+    attributes:
+      label: Additional context
+      description: Anything else we should know?

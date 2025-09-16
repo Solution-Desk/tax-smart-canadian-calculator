@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Documentation & roadmap
+    url: https://github.com/solutionsrme/canada-tax-smart-calc/blob/main/ABOUT.md
+    about: Learn about the product vision, roadmap ideas, and guiding principles.
+  - name: Support questions
+    url: https://github.com/solutionsrme/canada-tax-smart-calc/discussions
+    about: Post usage questions or share ideas with the community in GitHub Discussions.
