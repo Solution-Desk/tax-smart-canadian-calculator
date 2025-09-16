@@ -192,13 +192,13 @@ export default function TaxSmartCalculator() {
           </p>
 
           <div className="province-grid">
-            <div className="rate-card form-field-card">
-              <label className="field-label" htmlFor="province-select">
+            <article className="total-card form-field-card" aria-labelledby="province-select-label">
+              <label id="province-select-label" className="field-label" htmlFor="province-select">
                 Province / Territory
               </label>
               <select
                 id="province-select"
-                className="input"
+                className="input select"
                 value={province}
                 onChange={(event) => setProvince(event.target.value as Province)}
               >
@@ -208,7 +208,7 @@ export default function TaxSmartCalculator() {
                   </option>
                 ))}
               </select>
-            </div>
+            </article>
             <div className="rate-cards">
               <div className="rate-card">
                 <p className="muted">Federal (GST)</p>
