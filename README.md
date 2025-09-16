@@ -1,77 +1,130 @@
 # Canada Tax Smart Calc
 
-A modern, open‑source Canadian sales‑tax calculator for GST, HST, PST, and Quebec QST — built with Vite + TypeScript. Calculate, explain, and share results fast.
+Free, shareable Canada sales-tax calculator (GST/HST/PST/QST) with province-specific rules.  
+**Essentials stay free forever** (kids, food, hygiene) — extras & workflow features are Pro.
 
-**Live app:** https://solutionsrme.github.io/canada-tax-smart-calc/
+---
 
-## Free vs. Pro
+## Live URL (custom domain)
 
-| Feature | Free | Pro |
-|---------|------|-----|
-| **Line items** | Up to 5 | Unlimited |
-| **Provinces** | Single province | Multi-province comparison |
-| **Export** | Copy to clipboard | CSV/PDF export |
-| **Share links** | Public (24h expiry) | Private with revoke |
-| **Save calculations** | ❌ | ✅ Saved templates |
-| **Client workspaces** | ❌ | ✅ Per-client organization |
-| **Support** | Community | Priority email |
-| **Price** | Free | $9/month |
+Recommended: host at **https://taxapp.thesolutiondesk.ca** (subdomain of your site).
 
-This repository contains the free, open‑source calculator. A hosted Pro experience (open‑core model) is planned.
+If you prefer GitHub's default domain instead:  
+`https://solutionsrme.github.io/canada-tax-smart-calc/` (see **Deploy → Option B**).
 
-⚠️ **Until Pro ships, all logic runs client‑side and no accounts or payments are required.**
+---
 
-## Features
+## Product overview
 
-- **All provinces/territories** — correct GST/HST/PST/QST mixes per region
-- **Category intelligence** — common exemptions/rebates (books, children's goods, restaurant meals, etc.)
-- **Dark‑first UI** with one‑click light mode (nice for printing)
-- **Share & copy** — snapshot a calculation or copy totals quickly
-- **Reference links** — jump to CRA/provincial bulletins used for rules
+### Free categories (always available)
+- Standard
+- Zero-rated (basic groceries)
+- Children's clothing & footwear
+- Children's diapers
+- Children's car seats & booster seats
+- Feminine hygiene products
+- Prescription drugs / medical
+- Public transit fares
+- Printed books (qualifying) & Newspapers (qualifying)
+- Exempt / GST only / Provincial only (overrides)
 
-## Quick start (local)
+### Premium (gated) categories
+- Prepared food / restaurant
+- Snack foods / candy
+- Sweetened carbonated beverages
+- Cannabis (non-medical)
+- Tobacco / alcohol
+
+### Free features
+- Unlimited calculations (no account)
+- Share link (encodes line items)
+- Copy totals
+- One local preset (browser)
+- Dark mode
+- Transparent **References** list
+
+### Pro features (suggested)
+- PDF & CSV export
+- Unlimited presets & per-client projects
+- Batch import (CSV)
+- Multi-currency display
+- "Audit footnotes" (which rule triggered)
+
+> **Scope:** This app models GST/HST/PST/QST at checkout. Excise duties/markups (alcohol, tobacco, cannabis) and deposits/levies are **not** included.
+
+---
+
+## Pricing (recommended)
+
+- **Pro: CAD $14.99/year** (headline) or **$2.49/month**
+- Optional **Supporter: CAD $19.99/year** (same features; helps fund free access)
+- Essentials remain free for everyone
+
+You can adjust these copy/values in the paywall later.
+
+---
+
+## Tech stack
+
+- Vite + React (TypeScript)
+- Lightweight CSS (`src/index.css`)
+- Pure static build → GitHub Pages (or any static host)
+
+---
+
+## Local development
 
 ```bash
-# 1) Install dependencies
-npm install
-
-# 2) Run the dev server
+npm i
 npm run dev
-# Visit http://localhost:5173
-
-# 3) Production build
-npm run build
-# Preview the static output
-npm run preview
 ```
 
-## Local development (for contributors)
+Open the URL Vite prints (e.g., http://localhost:5173/).
 
-**Self‑hosting a production service is not supported.** This repo contains the free, open‑source calculator intended for local use and contributions. For a managed experience and Pro features, use the hosted app.
+## Build
 
-- **Preview locally:** `npm run build && npm run preview`
-- **Static hosts for previews:** Any static host works if you want to share a test build with teammates.
+```bash
+npm run build
+```
 
-## Hosting model
+Outputs static files to `dist/`.
 
-- **Live demo (Free):** Hosted on GitHub Pages (static). This is the public link shown in the repo.
-- **Pro (paid):** Hosted separately where serverless/backend is available (e.g., Vercel, Cloudflare Pages + Workers, Netlify). The SPA calls `api.*` endpoints for auth, billing webhooks, and entitlements.
+## Deploy
 
-You can keep GitHub Pages for the free demo while the Pro app runs elsewhere. The free app can call external APIs via `VITE_API_BASE_URL`.
+### Option A — Custom subdomain (recommended)
 
-## How it works
+Host at https://taxapp.thesolutiondesk.ca.
 
-- **Tax data & metadata:** `src/lib/taxData.ts`
-- **Computation engine:** `src/lib/taxCalculator.ts` (e.g., `calculateTotals`)
-- **Share‑link helpers:** `src/lib/share.ts`
-- **Dark‑mode state:** `src/hooks/useDarkMode.ts`
-- **Main UI:** `src/components/TaxSmartCalculator/`
+**DNS:** add a CNAME record at your DNS provider
+- Name/Host: `taxapp`
+- Target/Value: `solutionsrme.github.io`
+- TTL: default/auto
+- (Cloudflare: set to DNS only / grey cloud)
 
-## Notes on sharing
+**Vite base path:** custom domain serves at the root → set base to `/`
 
-Share‑links may include calculation details in the URL. If you need privacy‑preserving sharing, wait for the Pro/tokenized links or self‑host behind your own short‑link service.
+```typescript
+// vite.config.ts
+import { defineConfig } from 'vite'
+import react from '@vitejs/plugin-react'
 
-## Accuracy, data sources & limits
+export default defineConfig({
+  plugins: [react()],
+  base: '/', // custom domain -> root path
+})
+```
+
+**Permanent CNAME file (recommended):**
+Create `public/CNAME` containing:
+```
+taxapp.thesolutiondesk.ca
+```
+
+Vite will include this in every build so Pages auto-detects the domain.
+
+**GitHub Pages settings:**
+- Repo → Settings → Pages → Custom domain: `taxapp.thesolutiondesk.ca`
+- Check "Enforce HTTPS"
 
 - Rates/rules are implemented to the best of our knowledge and linked to CRA/provincial references.
 - **Not legal/tax advice.** Validate for your use case and keep rules up to date for your deployment.
