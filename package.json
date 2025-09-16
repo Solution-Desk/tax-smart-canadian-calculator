@@ -18,5 +18,25 @@
     "@vitejs/plugin-react": "^4.3.1",
     "typescript": "^5.4.5",
     "vite": "^5.4.2"
-  }
+  },
+  "description": "Canada GST / HST / PST / QST calculator with category-specific overrides and shareable state.",
+  "author": "Canada Tax Smart Calc maintainers",
+  "license": "MIT",
+  "keywords": [
+    "canada",
+    "gst",
+    "hst",
+    "pst",
+    "qst",
+    "tax",
+    "calculator",
+    "react",
+    "vite",
+    "typescript"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/your-user/canada-tax-smart-calc.git"
+  },
+  "homepage": "https://solutionsrme.github.io/canada-tax-smart-calc/"
 }
