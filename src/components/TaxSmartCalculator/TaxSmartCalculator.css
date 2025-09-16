@@ -127,6 +127,10 @@
   display: flex;
   flex-direction: column;
   gap: 12px;
+  background: var(--surface-raised);
+  border-radius: 16px;
+  border: 1px solid var(--border);
+  padding: 16px;
 }
 
 .field-label {
@@ -343,6 +347,22 @@ select.input {
 select.input option {
   background: var(--surface);
   color: var(--text-primary);
+}
+
+/* Fix dropdown options visibility in dark mode */
+select.input option:checked {
+  background: var(--accent);
+  color: #fff;
+}
+
+/* Ensure dropdown options are visible in all browsers */
+select.input {
+  color: var(--text-primary);
+}
+
+select.input option {
+  background: var(--surface) !important;
+  color: var(--text-primary) !important;
 }
 
 .sr-only {
