@@ -1,5 +1,10 @@
+import { AuthWrapper } from './components/AuthWrapper'
 import TaxSmartCalculator from './components/TaxSmartCalculator'
 
 export default function App() {
-  return <TaxSmartCalculator />
+  return (
+    <AuthWrapper>
+      <TaxSmartCalculator />
+    </AuthWrapper>
+  )
 }

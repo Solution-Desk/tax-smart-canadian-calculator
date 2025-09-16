@@ -1,0 +1,13 @@
+name = "canada-tax-calc-billing"
+main = "billing-webhook.ts"
+compatibility_date = "2023-12-01"
+
+[env.production]
+vars = { }
+
+[env.production.secrets]
+LEMON_SQUEEZY_WEBHOOK_SECRET = "your_webhook_secret_here"
+CLERK_SECRET_KEY = "your_clerk_secret_key_here"
+
+[[env.production.routes]]
+pattern = "api.yourdomain.com/webhooks/billing"
