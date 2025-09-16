@@ -3,9 +3,13 @@ import react from '@vitejs/plugin-react'
 
 export default defineConfig({
   plugins: [react()],
-  // IMPORTANT: base must match your repo name for GitHub Pages
-  base: '/canada-tax-smart-calc/',
+  base: '/', // custom domain serves from root
+  test: {
+    globals: true,
+    environment: 'jsdom',
+    setupFiles: './src/test/setup.ts',
+  },
   define: {
-    'process.env': {}
+    'process.env': process.env
   }
 })
