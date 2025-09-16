@@ -192,16 +192,23 @@ export default function TaxSmartCalculator() {
           </p>
 
           <div className="province-grid">
-            <label className="form-field">
-              <span className="field-label">Province / Territory</span>
-              <select value={province} onChange={(event) => setProvince(event.target.value as Province)}>
+            <div className="rate-card form-field-card">
+              <label className="field-label" htmlFor="province-select">
+                Province / Territory
+              </label>
+              <select
+                id="province-select"
+                className="input"
+                value={province}
+                onChange={(event) => setProvince(event.target.value as Province)}
+              >
                 {PROVINCES.map((code) => (
                   <option key={code} value={code}>
                     {code}
                   </option>
                 ))}
               </select>
-            </label>
+            </div>
             <div className="rate-cards">
               <div className="rate-card">
                 <p className="muted">Federal (GST)</p>

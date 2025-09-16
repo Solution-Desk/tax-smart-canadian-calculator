@@ -123,10 +123,10 @@
   align-items: stretch;
 }
 
-.form-field {
+.form-field-card {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 12px;
 }
 
 .field-label {
