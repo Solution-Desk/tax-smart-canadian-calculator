@@ -1,77 +1,112 @@
 # Canada Tax Smart Calc
 
-Canada Tax Smart Calc is a modern web app that helps Canadians—and the people who invoice them—combine GST, HST, PST, and Quebec QST in a single, shareable workspace.
+A modern, open‑source Canadian sales‑tax calculator for GST, HST, PST, and Quebec QST — built with Vite + TypeScript. Calculate, explain, and share results fast.
 
-## Quick links
-- **Live calculator:** https://solutionsrme.github.io/canada-tax-smart-calc/
-- **Product background:** [`ABOUT.md`](ABOUT.md)
-- **Changelog:** [`CHANGELOG.md`](CHANGELOG.md)
-- **Support:** [`SUPPORT.md`](SUPPORT.md)
-- **Security policy:** [`SECURITY.md`](SECURITY.md)
+**Live app:** https://solutionsrme.github.io/canada-tax-smart-calc/
 
-## Product at a glance
-- **All provinces covered** – swap between AB and YT to see the right GST/HST/PST/QST mix instantly.
-- **Category intelligence** – restaurant meals, children's goods, books, and more follow CRA and provincial rebates.
-- **Dark-first interface** – sleek default theme with a one-click light mode for print-friendly moments.
-- **Clipboard superpowers** – copy totals or share a calculator snapshot without leaving the page.
-- **Reference-ready** – built-in links to CRA and provincial bulletins for quick fact checks.
+## Free vs. Pro
 
-## Why teams use it
-- **Retail and hospitality** – quote accurate taxes for bundled goods or meals across provinces.
-- **Accounting and bookkeeping** – review exemptions with clients via shareable URLs instead of PDFs.
-- **E-commerce** – sanity-check storefront tax rules before rollout.
+| Feature | Free | Pro |
+|---------|------|-----|
+| **Line items** | Up to 5 | Unlimited |
+| **Provinces** | Single province | Multi-province comparison |
+| **Export** | Copy to clipboard | CSV/PDF export |
+| **Share links** | Public (24h expiry) | Private with revoke |
+| **Save calculations** | ❌ | ✅ Saved templates |
+| **Client workspaces** | ❌ | ✅ Per-client organization |
+| **Support** | Community | Priority email |
+| **Price** | Free | $9/month |
 
-## Experience walkthrough
-1. **Province selector** with real-time rate tiles (federal vs. provincial blend).
-2. **Line item grid** to capture label, category, and amount for each entry.
-3. **Totals dashboard** with GST/HST/PST/QST breakdown, total tax, and grand total.
-4. **Action tray** housing “Calculate tax,” “Copy totals,” and sharing shortcuts.
-5. **Reference drawer** linking to CRA and provincial documents used for the rules.
+This repository contains the free, open‑source calculator. A hosted Pro experience (open‑core model) is planned.
 
-## Under the hood
-- Province metadata and rates live in [`src/lib/taxData.ts`](src/lib/taxData.ts).
-- Calculation engine (`calculateTotals`) is in [`src/lib/taxCalculator.ts`](src/lib/taxCalculator.ts).
-- Share-link encode/decode helpers sit in [`src/lib/share.ts`](src/lib/share.ts).
-- Dark-mode state and DOM integration are handled by [`src/hooks/useDarkMode.ts`](src/hooks/useDarkMode.ts).
-- The main experience is composed in [`src/components/TaxSmartCalculator`](src/components/TaxSmartCalculator).
+⚠️ **Until Pro ships, all logic runs client‑side and no accounts or payments are required.**
 
-## Community & governance
-- Follow the contribution process outlined in [`CONTRIBUTING.md`](CONTRIBUTING.md).
-- We enforce the [Code of Conduct](CODE_OF_CONDUCT.md) and will moderate issues, PRs, and discussions accordingly.
-- Questions? Start a topic in [GitHub Discussions](https://github.com/solutionsrme/canada-tax-smart-calc/discussions) or review [`SUPPORT.md`](SUPPORT.md).
-- Vulnerability to report? See [`SECURITY.md`](SECURITY.md) for responsible disclosure guidelines.
-- Release history and planned notes live in [`CHANGELOG.md`](CHANGELOG.md).
+## Features
 
-## For developers
-Want to extend or self-host the calculator? Follow these steps:
+- **All provinces/territories** — correct GST/HST/PST/QST mixes per region
+- **Category intelligence** — common exemptions/rebates (books, children's goods, restaurant meals, etc.)
+- **Dark‑first UI** with one‑click light mode (nice for printing)
+- **Share & copy** — snapshot a calculation or copy totals quickly
+- **Reference links** — jump to CRA/provincial bulletins used for rules
+
+## Quick start (local)
 
 ```bash
+# 1) Install dependencies
 npm install
+
+# 2) Run the dev server
 npm run dev
-```
-Visit `http://localhost:5173` in your browser. The local build mirrors production, including dark mode.
+# Visit http://localhost:5173
 
-### Production build
-```bash
+# 3) Production build
 npm run build
+# Preview the static output
+npm run preview
 ```
-Artifacts land in `dist/`. Use `npm run preview` to sanity-check the static output.
 
-### Contribution checklist
-- Fork the repo and create a feature branch.
-- Keep business logic inside `src/lib`, UI inside `src/components`, and shared concerns as hooks.
-- Cite CRA or provincial sources in PRs when you update tax rules.
-- Run `npm run build` before opening a pull request and fill in the PR template.
+## Local development (for contributors)
 
-## Deployment
-GitHub Actions builds and deploys to GitHub Pages whenever `main` is updated.
+**Self‑hosting a production service is not supported.** This repo contains the free, open‑source calculator intended for local use and contributions. For a managed experience and Pro features, use the hosted app.
 
-1. Update `vite.config.ts` `base` if the repository name changes.
-2. The workflow (`.github/workflows/deploy.yml`) runs `npm ci`, `npm run build`, and uploads `dist/`.
-3. GitHub Pages serves the app at `https://<your-user>.github.io/<repo-name>/`.
+- **Preview locally:** `npm run build && npm run preview`
+- **Static hosts for previews:** Any static host works if you want to share a test build with teammates.
 
-Other static hosts (Netlify, Vercel, Cloudflare Pages, etc.) can deploy the `dist/` directory without extra configuration.
+## Hosting model
+
+- **Live demo (Free):** Hosted on GitHub Pages (static). This is the public link shown in the repo.
+- **Pro (paid):** Hosted separately where serverless/backend is available (e.g., Vercel, Cloudflare Pages + Workers, Netlify). The SPA calls `api.*` endpoints for auth, billing webhooks, and entitlements.
+
+You can keep GitHub Pages for the free demo while the Pro app runs elsewhere. The free app can call external APIs via `VITE_API_BASE_URL`.
+
+## How it works
+
+- **Tax data & metadata:** `src/lib/taxData.ts`
+- **Computation engine:** `src/lib/taxCalculator.ts` (e.g., `calculateTotals`)
+- **Share‑link helpers:** `src/lib/share.ts`
+- **Dark‑mode state:** `src/hooks/useDarkMode.ts`
+- **Main UI:** `src/components/TaxSmartCalculator/`
+
+## Notes on sharing
+
+Share‑links may include calculation details in the URL. If you need privacy‑preserving sharing, wait for the Pro/tokenized links or self‑host behind your own short‑link service.
+
+## Accuracy, data sources & limits
+
+- Rates/rules are implemented to the best of our knowledge and linked to CRA/provincial references.
+- **Not legal/tax advice.** Validate for your use case and keep rules up to date for your deployment.
+
+## Testing
+
+We're building out a Vitest suite with golden cases per province and category. Contributions welcome — see Contributing.
+
+## Roadmap
+
+- **Pro:** multi‑province comparison, CSV/PDF export, saved templates, private share links
+- **Pro:** per‑user workspaces and entitlement checks  
+- **Data:** effective‑date ranges for rules + changelog PR bot
+- **Accessibility:** keyboard table navigation and WCAG 2.1 AA audits
+
+## Contributing
+
+PRs are welcome.
+
+- Keep business logic in `src/lib`, UI in `src/components`, shared concerns as hooks.
+- Include links to CRA/provincial sources when changing tax rules.
+- Run `npm run build` before opening a PR and fill in the PR template.
+- Be kind — we follow the Code of Conduct.
+
+See: [`CONTRIBUTING.md`](CONTRIBUTING.md), [`CODE_OF_CONDUCT.md`](CODE_OF_CONDUCT.md).
+
+## Security & privacy
+
+- **Static SPA:** no server, no accounts, no telemetry by default
+- If you discover a vulnerability, please follow [`SECURITY.md`](SECURITY.md) for responsible disclosure
 
 ## License
-MIT License – full text in [`LICENSE`](LICENSE).
 
+MIT — see [`LICENSE`](LICENSE).
+
+## Acknowledgements
+
+Thanks to Canadian merchants, accountants, and developers who contributed test cases and references. ❤️
