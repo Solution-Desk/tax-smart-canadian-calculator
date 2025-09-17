@@ -7,18 +7,11 @@ export default defineConfig(({ mode }) => {
   // Load env file based on `mode` in the current working directory.
   const env = loadEnv(mode, process.cwd(), '');
   
+  const isProduction = env.NODE_ENV === 'production';
+  
   return {
     plugins: [react()],
-    base: env.VITE_BASE_URL || '/',
-    server: {
-      proxy: {
-        '/api': {
-          target: 'http://localhost:3001',
-          changeOrigin: true,
-          secure: false,
-        },
-      },
-    },
+    base: isProduction ? (env.VITE_BASE_URL || '/') : '/',
     test: {
       globals: true,
       environment: 'jsdom',
@@ -42,6 +35,13 @@ export default defineConfig(({ mode }) => {
     server: {
       port: 5173,
       open: true,
+      proxy: {
+        '/api': {
+          target: 'http://localhost:3001',
+          changeOrigin: true,
+          secure: false,
+        },
+      },
     },
     build: {
       outDir: 'dist',
