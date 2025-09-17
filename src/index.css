@@ -90,12 +90,3 @@ textarea {
   color: inherit;
   background: none;
 }
-
-button {
-  transition: background 0.2s ease, color 0.2s ease, box-shadow 0.25s ease, transform 0.2s ease;
-}
-
-button:hover:not(:disabled) {
-  box-shadow: 0 0 24px 6px var(--button-glow);
-  transform: translateY(-1px);
-}

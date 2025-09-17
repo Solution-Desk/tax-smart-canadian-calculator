@@ -12,8 +12,8 @@ export const STRIPE_PLANS = {
 } as const;
 
 export const STRIPE_PRICE_IDS = {
-  PRO_MONTHLY: process.env.VITE_STRIPE_MONTHLY_PRICE_ID || 'price_your_monthly_price_id_here',
-  PRO_YEARLY: process.env.VITE_STRIPE_YEARLY_PRICE_ID || 'price_your_yearly_price_id_here',
+  PRO_MONTHLY: 'price_1S8LcGC8Z2peWf8UabP3FePl', // tazsmart pro monthly
+  PRO_YEARLY: 'price_1S8LZbC8Z2peWf8Uk1yKWvyt',  // tazsmart pro yearly
 } as const;
 
 export async function openCheckout(planId: string, userId: string, email: string) {
