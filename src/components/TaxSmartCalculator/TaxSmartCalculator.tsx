@@ -8,12 +8,15 @@ import {
   TAX_RATES,
   getProvincialLabel,
   getProvincialRate,
+  PRO_ONLY_CATEGORIES,
 } from "../../lib/taxData"
 import { LineItemInput, calculateTotals, validateCategory } from "../../lib/taxCalculator"
 import { encodeState, extractStateFromHash } from "../../lib/share"
 import { useDarkMode } from "../../hooks/useDarkMode"
 import { SignedIn, SignedOut, SignInButton, UserButton } from '@clerk/clerk-react'
 import { Crown } from 'lucide-react'
+import { PricingModal } from '../PricingModal'
+import { usePlanStatus } from '../../hooks/useEntitlements'
 import "./TaxSmartCalculator.css"
 
 type LineItemForm = {
@@ -24,6 +27,14 @@ type LineItemForm = {
 }
 
 const CURRENCY = new Intl.NumberFormat('en-CA', { style: 'currency', currency: 'CAD' })
+const CONTACT_EMAIL = 'taxapp@thesolutiondesk.ca'
+const SPONSOR_URL = 'https://github.com/sponsors/Solution-Desk'
+const SPONSOR_IFRAME_PROPS = {
+  src: 'https://github.com/sponsors/Solution-Desk/button',
+  title: 'Sponsor Solution-Desk',
+  height: 32,
+  width: 114,
+}
 
 function createLineItem(index: number, overrides: Partial<LineItemForm> = {}): LineItemForm {
   return {
@@ -65,9 +76,6 @@ function toShareableItems(items: LineItemForm[]) {
   }))
 }
 
-// Import the existing PricingModal component
-import { PricingModal } from '../PricingModal';
-
 export default function TaxSmartCalculator() {
   const { theme, toggleTheme } = useDarkMode('dark');
   const [showUpgradeModal, setShowUpgradeModal] = React.useState(false);
@@ -75,6 +83,7 @@ export default function TaxSmartCalculator() {
   const [items, setItems] = React.useState<LineItemForm[]>([createLineItem(1)])
   const [notice, setNotice] = React.useState<string | null>(null)
   const [resultsVersion, setResultsVersion] = React.useState(0)
+  const { isPro } = usePlanStatus()
 
   const numericItems = React.useMemo<LineItemInput[]>(
     () => items.map((item) => ({ amount: parseAmount(item.amount), category: item.category })),
@@ -100,28 +109,19 @@ export default function TaxSmartCalculator() {
   }, [])
 
   const handleUpdateItem = React.useCallback((id: string, patch: Partial<LineItemForm>) => {
+    if (patch.category && !isPro && PRO_ONLY_CATEGORIES.includes(patch.category as Category)) {
+      showNotice('Upgrade to Pro to use that category');
+      setShowUpgradeModal(true);
+      return;
+    }
+
     setItems((current) => current.map((item) => (item.id === id ? { ...item, ...patch } : item)))
-  }, [])
+  }, [isPro, showNotice, setShowUpgradeModal])
 
   const handleCalculate = React.useCallback(() => {
     setResultsVersion((version) => version + 1)
     showNotice('Totals refreshed')
   }, [showNotice])
-
-  const handleCopyTotals = React.useCallback(async () => {
-    const parts = [
-      `Province: ${province}`,
-      `Subtotal: ${formatCurrency(totals.subTotal)}`,
-      TAX_RATES[province].kind === 'HST'
-        ? `HST: ${formatCurrency(totals.hst)}`
-        : `GST: ${formatCurrency(totals.federal)}\n${provincialLabel}: ${formatCurrency(totals.provincial)}`,
-      `Total tax: ${formatCurrency(totals.tax)}`,
-      `Grand total: ${formatCurrency(totals.grandTotal)}`,
-    ]
-
-    const success = await copyToClipboard(parts.join('\n'))
-    showNotice(success ? 'Totals copied' : 'Clipboard not available')
-  }, [province, provincialLabel, showNotice, totals])
 
   const handleCopyShareLink = React.useCallback(async () => {
     const parts = [
@@ -145,6 +145,16 @@ export default function TaxSmartCalculator() {
     showNotice(success ? 'Shareable link copied' : 'Clipboard not available')
   }, [items, province, showNotice])
 
+  const handleCopyEmail = React.useCallback(async () => {
+    const success = await copyToClipboard(CONTACT_EMAIL)
+    if (success) {
+      showNotice('Email copied to clipboard.')
+      return
+    }
+
+    window.location.href = `mailto:${CONTACT_EMAIL}`
+  }, [showNotice])
+
   React.useEffect(() => {
     if (typeof window === 'undefined') return
     const state = extractStateFromHash(window.location.hash)
@@ -156,13 +166,16 @@ export default function TaxSmartCalculator() {
         ? state.items.map((item, index) =>
             createLineItem(index + 1, {
               label: item.label,
-              category: validateCategory(item.category),
+              category: (() => {
+                const normalised = validateCategory(item.category)
+                return !isPro && PRO_ONLY_CATEGORIES.includes(normalised) ? 'Standard' : normalised
+              })(),
               amount: item.amount,
             })
           )
         : [createLineItem(1)],
     )
-  }, [])
+  }, [isPro])
 
   return (
     <div className="calculator-shell">
@@ -175,12 +188,6 @@ export default function TaxSmartCalculator() {
           </div>
         </div>
         <div className="header-actions">
-          <button type="button" className="btn whitespace-nowrap" onClick={handleCopyAppLink}>
-            Share app
-          </button>
-          <button type="button" className="btn whitespace-nowrap" onClick={handleCopyShareLink}>
-            Copy results
-          </button>
           <button type="button" className="btn whitespace-nowrap" onClick={toggleTheme}>
             {theme === 'dark' ? 'Light mode' : 'Dark mode'}
           </button>
@@ -284,11 +291,19 @@ export default function TaxSmartCalculator() {
                   value={item.category}
                   onChange={(event) => handleUpdateItem(item.id, { category: event.target.value as Category })}
                 >
-                  {CATEGORY_OPTIONS.map((option) => (
-                    <option key={option} value={option}>
-                      {option}
-                    </option>
-                  ))}
+                  {CATEGORY_OPTIONS.map((option) => {
+                    const requiresPro = PRO_ONLY_CATEGORIES.includes(option)
+                    return (
+                      <option
+                        key={option}
+                        value={option}
+                        disabled={!isPro && requiresPro}
+                      >
+                        {option}
+                        {!isPro && requiresPro ? ' (Pro)' : ''}
+                      </option>
+                    )
+                  })}
                 </select>
                 <label className="sr-only" htmlFor={`amount-${item.id}`}>
                   Item amount
@@ -323,24 +338,21 @@ export default function TaxSmartCalculator() {
             <button type="button" className="btn ghost" onClick={handleAddItem}>
               + Add item
             </button>
+            <button type="button" className="btn primary" onClick={handleCalculate}>
+              Calculate tax
+            </button>
           </div>
         </section>
-
-        <div className="panel actions">
-          <button type="button" className="btn primary" onClick={handleCalculate}>
-            Calculate tax
-          </button>
-        </div>
 
         <section key={resultsVersion} className="panel">
           <div className="panel-header">
             <h2 className="panel-title">Totals</h2>
             <div className="header-actions">
-              <button type="button" className="btn" onClick={handleCopyTotals}>
-                Copy totals
+              <button type="button" className="btn" onClick={handleCopyAppLink}>
+                Share app
               </button>
               <button type="button" className="btn" onClick={handleCopyShareLink}>
-                Share link
+                Copy results
               </button>
             </div>
           </div>
@@ -420,12 +432,51 @@ export default function TaxSmartCalculator() {
             Excise duties or deposits on alcohol, tobacco, cannabis, and containers are not included.
           </p>
         </section>
+
+        <section className="panel">
+          <h2 className="panel-title">Need help or have ideas?</h2>
+          <p>
+            Spot a rate mismatch, want a new workflow shortcut, or need a second set of eyes on your quote?
+            Reach us at the address below and we’ll get back within one business day.
+          </p>
+          <div className="contact-email-group">
+            <a className="contact-email" href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>
+            <button type="button" className="btn ghost btn-copy-email" onClick={handleCopyEmail}>
+              Copy
+            </button>
+          </div>
+          <a
+            className="btn primary feedback-sponsor"
+            href={SPONSOR_URL}
+            target="_blank"
+            rel="noreferrer"
+          >
+            Support us on GitHub Sponsors
+          </a>
+          <iframe
+            className="sponsor-iframe"
+            {...SPONSOR_IFRAME_PROPS}
+            style={{ border: 0, borderRadius: '6px' }}
+          />
+        </section>
       </main>
 
       <footer className="calculator-footer">
-        Built for Canadians. Totally free. No ads.
+        <span>Built for Canadians. Totally free. No ads.</span>
+        <a
+          className="btn ghost footer-sponsor"
+          href={SPONSOR_URL}
+          target="_blank"
+          rel="noreferrer"
+        >
+          Sponsor us on GitHub
+        </a>
+        <iframe
+          className="sponsor-iframe"
+          {...SPONSOR_IFRAME_PROPS}
+          style={{ border: 0, borderRadius: '6px' }}
+        />
       </footer>
     </div>
   )
 }
-

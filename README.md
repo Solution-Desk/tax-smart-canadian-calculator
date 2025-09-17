@@ -108,11 +108,15 @@ If you prefer GitHub's default domain instead, you can use:
 
 ## Pricing (recommended)
 
-- **Pro: CAD $14.99/year** (headline) or **$2.49/month**
-- Optional **Supporter: CAD $19.99/year** (same features; helps fund free access)
-- Essentials remain free for everyone
+- **Pro: CA$19.99/year** (headline) or **CA$3.49/month**
+- Optional **Supporter: CA$24.99/year** (same features; helps fund the free essentials)
+- Essentials remain free for everyone — promo room for special offers (e.g., “Founding year CA$14.99”)
 
 You can adjust these copy/values in the paywall later.
+
+### Money-making potential (quick model)
+
+- Paywall views from visitors: ~5% (triggered when selecting a premium category or exporting)
 
 ---
 
