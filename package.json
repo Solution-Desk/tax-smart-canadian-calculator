@@ -6,11 +6,9 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "build:gh-pages": "vite build --base=/tax-smart-canadian-calculator/",
     "prebuild": "node scripts/generate-build-info.js",
     "preview": "vite preview",
-    "test": "vitest",
-    "deploy": "npm run build:gh-pages && gh-pages -d dist"
+    "test": "vitest"
   },
   "dependencies": {
     "@clerk/clerk-react": "^4.32.5",
@@ -60,7 +58,6 @@
     "type": "git",
     "url": "https://github.com/solutionsrme/canada-tax-smart-calc.git"
   },
-  "homepage": "https://solutionsrme.github.io/canada-tax-smart-calc/",
   "bugs": {
     "url": "https://github.com/solutionsrme/canada-tax-smart-calc/issues"
   }
