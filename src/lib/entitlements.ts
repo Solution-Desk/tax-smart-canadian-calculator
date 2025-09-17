@@ -39,5 +39,5 @@ export function canAddLineItem(currentCount: number, entitlements: Entitlements)
 }
 
 export function getUpgradeMessage(feature: string): string {
-  return `${feature} is available with Pro. Upgrade to unlock unlimited calculations, exports, and more!`
+  return `${feature} is available with Pro. upgrade to unlock unlimited calculations, exports, and more!`
 }
