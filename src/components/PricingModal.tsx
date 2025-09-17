@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useUser } from '@clerk/clerk-react'
 import { X, Check, Crown, Zap } from 'lucide-react'
-import { openCheckout, LEMON_SQUEEZY_VARIANTS } from '../lib/billing'
+import { openCheckout, STRIPE_PRICE_IDS } from '../lib/billing'
 
 interface PricingModalProps {
   isOpen: boolean
@@ -151,14 +151,14 @@ export function PricingModal({ isOpen, onClose }: PricingModalProps) {
               
               <div className="space-y-3">
                 <button
-                  onClick={() => handleUpgrade(LEMON_SQUEEZY_VARIANTS.PRO_MONTHLY)}
+                  onClick={() => handleUpgrade(STRIPE_PRICE_IDS.PRO_MONTHLY)}
                   disabled={isLoading}
-                  className="w-full bg-amber-500 hover:bg-amber-600 text-white font-medium py-2 px-4 rounded-lg transition-colors disabled:opacity-50"
+                  className="w-full bg-amber-500 hover:bg-amber-600 text-white font-medium py-2 px-4 rounded-md flex items-center justify-center gap-2 transition-colors disabled:opacity-50"
                 >
                   {isLoading ? 'Loading...' : 'Upgrade Monthly'}
                 </button>
                 <button
-                  onClick={() => handleUpgrade(LEMON_SQUEEZY_VARIANTS.PRO_YEARLY)}
+                  onClick={() => handleUpgrade(STRIPE_PRICE_IDS.PRO_YEARLY)}
                   disabled={isLoading}
                   className="w-full bg-amber-600 hover:bg-amber-700 text-white font-medium py-2 px-4 rounded-lg transition-colors disabled:opacity-50"
                 >

@@ -12,6 +12,8 @@ import {
 import { LineItemInput, calculateTotals, validateCategory } from "../../lib/taxCalculator"
 import { encodeState, extractStateFromHash } from "../../lib/share"
 import { useDarkMode } from "../../hooks/useDarkMode"
+import { SignedIn, SignedOut, SignInButton, UserButton } from '@clerk/clerk-react'
+import { Crown } from 'lucide-react'
 import "./TaxSmartCalculator.css"
 
 type LineItemForm = {
@@ -63,8 +65,12 @@ function toShareableItems(items: LineItemForm[]) {
   }))
 }
 
+// Import the existing PricingModal component
+import { PricingModal } from '../PricingModal';
+
 export default function TaxSmartCalculator() {
-  const { theme, toggleTheme } = useDarkMode('dark')
+  const { theme, toggleTheme } = useDarkMode('dark');
+  const [showUpgradeModal, setShowUpgradeModal] = React.useState(false);
   const [province, setProvince] = React.useState<Province>(DEFAULT_PROVINCE)
   const [items, setItems] = React.useState<LineItemForm[]>([createLineItem(1)])
   const [notice, setNotice] = React.useState<string | null>(null)
@@ -118,20 +124,26 @@ export default function TaxSmartCalculator() {
   }, [province, provincialLabel, showNotice, totals])
 
   const handleCopyShareLink = React.useCallback(async () => {
-    if (typeof window === 'undefined') return
-    const shareUrl = new URL(window.location.href)
-    shareUrl.hash = encodeState({ province, items: toShareableItems(items) })
-    const success = await copyToClipboard(shareUrl.toString())
-    showNotice(success ? 'Share link copied' : 'Clipboard not available')
-  }, [items, province, showNotice])
+    const parts = [
+      `Province: ${province}`,
+      `Subtotal: ${formatCurrency(totals.subTotal)}`,
+      TAX_RATES[province].kind === 'HST'
+        ? `HST: ${formatCurrency(totals.hst)}`
+        : `GST: ${formatCurrency(totals.federal)}\n${provincialLabel}: ${formatCurrency(totals.provincial)}`,
+      `Total tax: ${formatCurrency(totals.tax)}`,
+      `Grand total: ${formatCurrency(totals.grandTotal)}`,
+    ]
+    const success = await copyToClipboard(parts.join('\n'))
+    showNotice(success ? 'Results copied to clipboard' : 'Clipboard not available')
+  }, [province, provincialLabel, showNotice, totals])
 
   const handleCopyAppLink = React.useCallback(async () => {
     if (typeof window === 'undefined') return
     const shareUrl = new URL(window.location.href)
-    shareUrl.hash = ''
+    shareUrl.hash = encodeState({ province, items: toShareableItems(items) })
     const success = await copyToClipboard(shareUrl.toString())
-    showNotice(success ? 'App link copied' : 'Clipboard not available')
-  }, [showNotice])
+    showNotice(success ? 'Shareable link copied' : 'Clipboard not available')
+  }, [items, province, showNotice])
 
   React.useEffect(() => {
     if (typeof window === 'undefined') return
@@ -163,17 +175,41 @@ export default function TaxSmartCalculator() {
           </div>
         </div>
         <div className="header-actions">
-          <button type="button" className="btn" onClick={handleCopyAppLink}>
-            Share calculator
+          <button type="button" className="btn whitespace-nowrap" onClick={handleCopyAppLink}>
+            Share app
           </button>
-          <button type="button" className="btn" onClick={handleCopyShareLink}>
-            Share snapshot
+          <button type="button" className="btn whitespace-nowrap" onClick={handleCopyShareLink}>
+            Copy results
           </button>
-          <button type="button" className="btn" onClick={toggleTheme}>
+          <button type="button" className="btn whitespace-nowrap" onClick={toggleTheme}>
             {theme === 'dark' ? 'Light mode' : 'Dark mode'}
           </button>
+          <button 
+            onClick={() => setShowUpgradeModal(true)}
+            className="btn whitespace-nowrap bg-gradient-to-r from-amber-400 to-amber-500 text-white border-transparent hover:from-amber-500 hover:to-amber-600 shadow-md hover:shadow-lg transition-all duration-200 transform hover:-translate-y-0.5"
+          >
+            <Crown className="h-3.5 w-3.5 inline-block mr-1.5" />
+            <span>Upgrade</span>
+          </button>
+          <SignedOut>
+            <SignInButton mode="modal">
+              <button className="btn whitespace-nowrap bg-indigo-600 text-white hover:bg-indigo-700 border-transparent">
+                Sign in
+              </button>
+            </SignInButton>
+          </SignedOut>
+          <SignedIn>
+            <div className="flex-shrink-0">
+              <UserButton afterSignOutUrl="/" />
+            </div>
+          </SignedIn>
         </div>
       </header>
+      
+      <PricingModal 
+        isOpen={showUpgradeModal} 
+        onClose={() => setShowUpgradeModal(false)} 
+      />
 
       {notice && (
         <div role="status" className="calculator-notice">
@@ -181,7 +217,7 @@ export default function TaxSmartCalculator() {
         </div>
       )}
 
-      <main className="calculator-main">
+      <main className="calculator-main grid grid-cols-1 md:grid-cols-2 gap-6">
         <section className="panel">
           <div className="panel-header">
             <h1 className="panel-title">Canada sales-tax smart calculator</h1>

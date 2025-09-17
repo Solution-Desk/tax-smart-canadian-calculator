@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';
-import { ClerkProvider } from './ClerkProvider';
+import { ClerkProvider } from '@clerk/clerk-react';
 import App from './App';
 import ErrorBoundary from './ErrorBoundary';
 import './index.css';
@@ -10,17 +10,28 @@ import './index.css';
 const rootElement = document.getElementById('root');
 if (rootElement) {
   const loadingElement = document.querySelector('.loading');
-  if (loadingElement && loadingElement.parentNode) {
+  if (loadingElement?.parentNode) {
     loadingElement.parentNode.removeChild(loadingElement);
   }
 }
 
 // Get the base URL from environment variables or use root
 const baseUrl = import.meta.env.VITE_BASE_URL || '/';
+const publishableKey = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY;
 
 // Log environment info for debugging
 console.log('Environment:', import.meta.env.MODE);
 console.log('Base URL:', baseUrl);
+console.log('Clerk Key Present:', !!publishableKey);
+console.log('Lemon Squeezy Store ID:', import.meta.env.VITE_LEMON_SQUEEZY_STORE_ID);
+
+if (!publishableKey) {
+  console.error('Missing Clerk Publishable Key. Please check your .env file');
+}
+
+if (!import.meta.env.VITE_LEMON_SQUEEZY_STORE_ID) {
+  console.warn('Lemon Squeezy Store ID not found. The upgrade functionality will not work.');
+}
 
 // Render the app
 const root = ReactDOM.createRoot(document.getElementById('root')!);
@@ -36,7 +47,13 @@ const AppWithProviders = () => (
       }
     >
       <BrowserRouter basename={baseUrl}>
-        <ClerkProvider>
+        <ClerkProvider 
+          publishableKey={publishableKey}
+          afterSignInUrl="/"
+          afterSignUpUrl="/"
+          signInUrl="/sign-in"
+          signUpUrl="/sign-up"
+        >
           <App />
         </ClerkProvider>
       </BrowserRouter>

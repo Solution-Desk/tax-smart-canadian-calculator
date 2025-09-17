@@ -1,7 +1,6 @@
-import { defineConfig } from 'vite';
+import { defineConfig, loadEnv } from 'vite';
 import react from '@vitejs/plugin-react';
 import { resolve } from 'path';
-import { loadEnv } from 'vite';
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => {
@@ -10,7 +9,16 @@ export default defineConfig(({ mode }) => {
   
   return {
     plugins: [react()],
-    base: '/', // Always use root for now, we'll handle this with environment variables
+    base: env.VITE_BASE_URL || '/',
+    server: {
+      proxy: {
+        '/api': {
+          target: 'http://localhost:3001',
+          changeOrigin: true,
+          secure: false,
+        },
+      },
+    },
     test: {
       globals: true,
       environment: 'jsdom',
@@ -18,7 +26,13 @@ export default defineConfig(({ mode }) => {
     },
     define: {
       'process.env': {},
-      'import.meta.env.VITE_APP_CLERK_PUBLISHABLE_KEY': JSON.stringify(env.VITE_APP_CLERK_PUBLISHABLE_KEY || '')
+      'import.meta.env': {
+        ...env,
+        VITE_CLERK_PUBLISHABLE_KEY: JSON.stringify(env.VITE_CLERK_PUBLISHABLE_KEY || ''),
+        VITE_LEMON_SQUEEZY_STORE_ID: JSON.stringify(env.VITE_LEMON_SQUEEZY_STORE_ID || ''),
+        VITE_LEMON_SQUEEZY_MONTHLY_VARIANT: JSON.stringify(env.VITE_LEMON_SQUEEZY_MONTHLY_VARIANT || ''),
+        VITE_LEMON_SQUEEZY_YEARLY_VARIANT: JSON.stringify(env.VITE_LEMON_SQUEEZY_YEARLY_VARIANT || '')
+      }
     },
     resolve: {
       alias: {
