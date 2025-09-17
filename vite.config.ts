@@ -6,13 +6,12 @@ import { resolve } from 'path';
 export default defineConfig(({ mode }) => {
   // Load env file based on `mode` in the current working directory.
   const env = loadEnv(mode, process.cwd(), '');
-  
-  const isProduction = env.NODE_ENV === 'production';
+  const basePath = env.VITE_BASE_URL || '/';
   
   return {
     plugins: [react()],
     // For GitHub Pages, we need to use the repository name as the base path
-    base: isProduction ? '/tax-smart-canadian-calculator/' : '/',
+    base: basePath,
     test: {
       globals: true,
       environment: 'jsdom',
