@@ -6,12 +6,13 @@ import { resolve } from 'path';
 export default defineConfig(({ mode }) => {
   // Load env file based on `mode` in the current working directory.
   const env = loadEnv(mode, process.cwd(), '');
-  const basePath = env.VITE_BASE_URL || '/';
+  
+  // For GitHub Pages on a custom domain, base should be '/'
+  const base = env.VITE_BASE_URL || '/';
   
   return {
     plugins: [react()],
-    // For GitHub Pages, we need to use the repository name as the base path
-    base: basePath,
+    base,
     test: {
       globals: true,
       environment: 'jsdom',
