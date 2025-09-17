@@ -1,5 +1,6 @@
 import React, { Suspense } from 'react';
 import { AuthWrapper } from './components/AuthWrapper';
+import { Footer } from './components/Footer';
 
 // Lazy load the calculator to improve initial load time
 const TaxSmartCalculator = React.lazy(() => import('./components/TaxSmartCalculator/TaxSmartCalculator'));
@@ -55,12 +56,17 @@ class ErrorBoundary extends React.Component<{ children: React.ReactNode }, { has
 
 export default function App() {
   return (
-    <AuthWrapper>
-      <ErrorBoundary>
-        <Suspense fallback={<LoadingFallback />}>
-          <TaxSmartCalculator />
-        </Suspense>
-      </ErrorBoundary>
-    </AuthWrapper>
+    <div className="app-container">
+      <AuthWrapper>
+        <ErrorBoundary>
+          <Suspense fallback={<LoadingFallback />}>
+            <main className="main-content">
+              <TaxSmartCalculator />
+            </main>
+            <Footer />
+          </Suspense>
+        </ErrorBoundary>
+      </AuthWrapper>
+    </div>
   );
 }

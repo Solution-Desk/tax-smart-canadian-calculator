@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import {
   CATEGORY_OPTIONS,
   Category,
@@ -13,6 +13,8 @@ import {
 import { LineItemInput, calculateTotals, validateCategory } from "../../lib/taxCalculator"
 import { encodeState, extractStateFromHash } from "../../lib/share"
 import { useDarkMode } from "../../hooks/useDarkMode"
+import { useLocalStorage } from "../../hooks/useAutoCalc"
+import { TAX_PRESETS } from "../../lib/taxPresets"
 import { SignedIn, SignedOut, SignInButton, UserButton } from '@clerk/clerk-react'
 import { Crown } from 'lucide-react'
 import { PricingModal } from '../PricingModal'
@@ -78,37 +80,55 @@ function toShareableItems(items: LineItemForm[]) {
 
 export default function TaxSmartCalculator() {
   const { theme, toggleTheme } = useDarkMode('dark');
-  const [showUpgradeModal, setShowUpgradeModal] = React.useState(false);
-  const [province, setProvince] = React.useState<Province>(DEFAULT_PROVINCE)
-  const [items, setItems] = React.useState<LineItemForm[]>([createLineItem(1)])
-  const [notice, setNotice] = React.useState<string | null>(null)
-  const [resultsVersion, setResultsVersion] = React.useState(0)
+  const [showUpgradeModal, setShowUpgradeModal] = useState(false);
+  const [province, setProvince] = useLocalStorage<Province>('taxapp:province', DEFAULT_PROVINCE)
+  const [items, setItems] = useState<LineItemForm[]>([createLineItem(1)])
+  const [notice, setNotice] = useState<string | null>(null)
+  const [resultsVersion, setResultsVersion] = useState(0)
   const { isPro } = usePlanStatus()
 
-  const numericItems = React.useMemo<LineItemInput[]>(
+  const numericItems = useMemo<LineItemInput[]>(
     () => items.map((item) => ({ amount: parseAmount(item.amount), category: item.category })),
     [items],
   )
 
-  const { totals } = React.useMemo(() => calculateTotals(numericItems, province), [numericItems, province])
+  const { totals } = useMemo(
+    () => calculateTotals(numericItems, province),
+    [numericItems, province]
+  )
 
   const provincialLabel = getProvincialLabel(TAX_RATES[province].kind)
   const provincialRate = getProvincialRate(province)
 
-  const showNotice = React.useCallback((message: string) => {
+  const showNotice = useCallback((message: string) => {
     setNotice(message)
     window.setTimeout(() => setNotice(null), 1800)
   }, [])
 
-  const handleAddItem = React.useCallback(() => {
-    setItems((current) => [...current, createLineItem(current.length + 1)])
+  const handleAddItem = useCallback((presetOrEvent?: (typeof TAX_PRESETS)[number] | React.MouseEvent) => {
+    // Handle case where it's called from a click event
+    if (presetOrEvent && 'preventDefault' in presetOrEvent) {
+      presetOrEvent.preventDefault();
+      setItems((current) => [...current, createLineItem(current.length + 1)]);
+      return;
+    }
+    
+    // Handle case where it's called with a preset
+    const preset = presetOrEvent as (typeof TAX_PRESETS)[number] | undefined;
+    setItems((current) => [
+      ...current, 
+      createLineItem(current.length + 1, {
+        label: preset?.label || '',
+        category: preset?.category || 'Standard',
+      })
+    ]);
   }, [])
 
-  const handleRemoveItem = React.useCallback((id: string) => {
+  const handleRemoveItem = useCallback((id: string) => {
     setItems((current) => (current.length > 1 ? current.filter((item) => item.id !== id) : current))
   }, [])
 
-  const handleUpdateItem = React.useCallback((id: string, patch: Partial<LineItemForm>) => {
+  const handleUpdateItem = useCallback((id: string, patch: Partial<LineItemForm>) => {
     if (patch.category && !isPro && PRO_ONLY_CATEGORIES.includes(patch.category as Category)) {
       showNotice('Upgrade to Pro to use that category');
       setShowUpgradeModal(true);
@@ -118,7 +138,7 @@ export default function TaxSmartCalculator() {
     setItems((current) => current.map((item) => (item.id === id ? { ...item, ...patch } : item)))
   }, [isPro, showNotice, setShowUpgradeModal])
 
-  const handleCalculate = React.useCallback(() => {
+  const handleCalculate = useCallback(() => {
     setResultsVersion((version) => version + 1)
     showNotice('Totals refreshed')
   }, [showNotice])
@@ -154,6 +174,8 @@ export default function TaxSmartCalculator() {
 
     window.location.href = `mailto:${CONTACT_EMAIL}`
   }, [showNotice])
+
+  // Auto-calculated via useMemo with [numericItems, province] dependency
 
   React.useEffect(() => {
     if (typeof window === 'undefined') return
@@ -335,8 +357,34 @@ export default function TaxSmartCalculator() {
             ))}
           </div>
           <div className="line-items-actions">
+            <div className="preset-dropdown">
+              <select
+                className="preset-select"
+                onChange={(e) => {
+                  const presetId = e.target.value;
+                  if (presetId) {
+                    const preset = TAX_PRESETS.find(p => p.id === presetId);
+                    if (preset) {
+                      handleAddItem(preset);
+                    }
+                  }
+                  e.target.value = ''; // Reset the select
+                }}
+                value=""
+              >
+                <option value="">Add common item...</option>
+                <optgroup label="Common Items">
+                  {TAX_PRESETS.map((preset) => (
+                    <option key={preset.id} value={preset.id}>
+                      {preset.icon} {preset.label}
+                    </option>
+                  ))}
+                </optgroup>
+              </select>
+              <span className="dropdown-arrow">▼</span>
+            </div>
             <button type="button" className="btn ghost" onClick={handleAddItem}>
-              + Add item
+              + Add Custom Item
             </button>
             <button type="button" className="btn primary" onClick={handleCalculate}>
               Calculate tax
