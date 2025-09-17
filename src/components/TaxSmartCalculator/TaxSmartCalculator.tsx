@@ -261,9 +261,6 @@ export default function TaxSmartCalculator() {
         <section className="panel">
           <div className="panel-header">
             <h2 className="panel-title">Line items</h2>
-            <button type="button" className="btn ghost" onClick={handleAddItem}>
-              + Add item
-            </button>
           </div>
           <div className="line-items">
             {items.map((item) => (
@@ -321,6 +318,11 @@ export default function TaxSmartCalculator() {
                 </button>
               </div>
             ))}
+          </div>
+          <div className="line-items-actions">
+            <button type="button" className="btn ghost" onClick={handleAddItem}>
+              + Add item
+            </button>
           </div>
         </section>
 

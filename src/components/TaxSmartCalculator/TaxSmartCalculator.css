@@ -184,6 +184,12 @@
   gap: 14px;
 }
 
+.line-items-actions {
+  margin-top: 16px;
+  display: flex;
+  justify-content: flex-end;
+}
+
 .line-item {
   display: grid;
   grid-template-columns: minmax(0, 2fr) minmax(0, 2fr) minmax(0, 1.2fr) auto;
@@ -297,7 +303,7 @@
 }
 
 .btn:hover:not(:disabled) {
-  box-shadow: var(--shadow-sm), 0 0 18px var(--button-glow);
+  box-shadow: var(--shadow-sm), 0 0 26px 8px var(--button-glow);
   transform: translateY(-1px);
 }
 
@@ -397,6 +403,10 @@ select.input option {
 
   .header-actions {
     width: 100%;
+    justify-content: flex-start;
+  }
+
+  .line-items-actions {
     justify-content: flex-start;
   }
 }

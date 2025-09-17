@@ -18,7 +18,7 @@
   --notice-bg: rgba(34, 197, 94, 0.12);
   --notice-border: rgba(34, 197, 94, 0.4);
   --notice-text: #bbf7d0;
-  --button-glow: rgba(139, 92, 246, 0.35);
+  --button-glow: rgba(139, 92, 246, 0.55);
 }
 
 :root[data-theme='light'] {
@@ -41,7 +41,7 @@
   --notice-bg: rgba(34, 197, 94, 0.18);
   --notice-border: rgba(34, 197, 94, 0.32);
   --notice-text: #166534;
-  --button-glow: rgba(79, 70, 229, 0.28);
+  --button-glow: rgba(79, 70, 229, 0.42);
 }
 
 * {
@@ -96,6 +96,6 @@ button {
 }
 
 button:hover:not(:disabled) {
-  box-shadow: 0 0 18px var(--button-glow);
+  box-shadow: 0 0 24px 6px var(--button-glow);
   transform: translateY(-1px);
 }
