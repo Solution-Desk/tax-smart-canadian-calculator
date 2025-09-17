@@ -11,7 +11,8 @@ export default defineConfig(({ mode }) => {
   
   return {
     plugins: [react()],
-    base: isProduction ? 'https://taxapp.thesolutiondesk.ca/' : '/',
+    // For GitHub Pages, we need to use the repository name as the base path
+    base: isProduction ? '/tax-smart-canadian-calculator/' : '/',
     test: {
       globals: true,
       environment: 'jsdom',

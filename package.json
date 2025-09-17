@@ -6,9 +6,10 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
+    "build:gh-pages": "vite build --base=/tax-smart-canadian-calculator/",
     "preview": "vite preview",
     "test": "vitest",
-    "deploy": "./gh-pages-deploy.sh"
+    "deploy": "npm run build:gh-pages && gh-pages -d dist"
   },
   "dependencies": {
     "@clerk/clerk-react": "^4.32.5",
@@ -33,6 +34,7 @@
     "@types/react-dom": "^18.3.0",
     "@vitejs/plugin-react": "^4.3.1",
     "concurrently": "^8.2.2",
+    "gh-pages": "^6.3.0",
     "jsdom": "^23.0.1",
     "typescript": "^5.4.5",
     "vite": "^5.4.2",
