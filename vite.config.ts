@@ -11,7 +11,7 @@ export default defineConfig(({ mode }) => {
   
   return {
     plugins: [react()],
-    base: isProduction ? (env.VITE_BASE_URL || '/') : '/',
+    base: isProduction ? '/' : '/',
     test: {
       globals: true,
       environment: 'jsdom',
@@ -44,7 +44,7 @@ export default defineConfig(({ mode }) => {
       },
     },
     build: {
-      outDir: 'dist',
+      outDir: 'docs',
       assetsDir: 'assets',
       sourcemap: true,
       emptyOutDir: true,

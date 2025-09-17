@@ -1,0 +1,7 @@
+# Security headers for Cloudflare Pages
+/*
+  X-Frame-Options: DENY
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: no-referrer
+  Permissions-Policy: camera=(), microphone=(), geolocation=()
+  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' https://clerk.solutionsrme.github.io https://*.clerk.accounts.dev https://*.lemonsqueezy.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; connect-src 'self' https://api.clerk.dev https://*.lemonsqueezy.com https://api.yourdomain.com; font-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self';
