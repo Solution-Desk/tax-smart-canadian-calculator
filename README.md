@@ -1,22 +1,71 @@
-# Canada Tax Smart Calc
+# Canada Tax Smart Calculator
 
-Free, shareable Canada sales-tax calculator (GST/HST/PST/QST) with province-specific rules.  
-**Essentials stay free forever** (kids, food, hygiene) — extras & workflow features are Pro.
+A modern, responsive Canadian tax calculator that helps you calculate GST/HST/PST/QST with per-province overrides.
 
----
+## Features
 
-## Live URL (custom domain)
+- Calculate Canadian sales taxes (GST/HST/PST/QST)
+- Province-specific tax rates
+- Shareable calculation links
+- Responsive design
 
-Recommended: host at **https://taxapp.thesolutiondesk.ca** (subdomain of your site).
+## Getting Started
 
-If you prefer GitHub's default domain instead:  
-`https://solutionsrme.github.io/canada-tax-smart-calc/` (see **Deploy → Option B**).
+### Prerequisites
 
----
+- Node.js 16+ and npm
 
-## Product overview
+### Installation
 
-### Free categories (always available)
+1. Clone the repository:
+
+   ```bash
+   git clone https://github.com/Solution-Desk/tax-smart-canadian-calculator.git
+   cd tax-smart-canadian-calculator
+   ```
+
+2. Install dependencies:
+
+   ```bash
+   npm install
+   ```
+
+### Development
+
+Start the development server:
+
+```bash
+npm run dev
+```
+
+### Building for Production
+
+Build the project:
+
+```bash
+npm run build
+```
+
+### Deployment
+
+Deploy to GitHub Pages:
+
+```bash
+npm run deploy
+```
+
+
+## Live URL
+
+Recommended: Host at [taxapp.thesolutiondesk.ca](https://taxapp.thesolutiondesk.ca) (subdomain of your site).
+
+If you prefer GitHub's default domain instead, you can use:
+[GitHub Pages](https://solutionsrme.github.io/canada-tax-smart-calc/)
+
+## Product Overview
+
+### Free Categories (Always Available)
+
 - Standard
 - Zero-rated (basic groceries)
 - Children's clothing & footwear
@@ -28,14 +77,16 @@ If you prefer GitHub's default domain instead:
 - Printed books (qualifying) & Newspapers (qualifying)
 - Exempt / GST only / Provincial only (overrides)
 
-### Premium (gated) categories
+### Premium (Gated Categories)
+
 - Prepared food / restaurant
 - Snack foods / candy
 - Sweetened carbonated beverages
 - Cannabis (non-medical)
 - Tobacco / alcohol
 
-### Free features
+### Free Features
+
 - Unlimited calculations (no account)
 - Share link (encodes line items)
 - Copy totals
@@ -43,7 +94,8 @@ If you prefer GitHub's default domain instead:
 - Dark mode
 - Transparent **References** list
 
-### Pro features (suggested)
+### Pro Features (Suggested)
+
 - PDF & CSV export
 - Unlimited presets & per-client projects
 - Batch import (CSV)
@@ -72,14 +124,14 @@ You can adjust these copy/values in the paywall later.
 
 ---
 
-## Local development
+## Local Development
 
 ```bash
 npm i
 npm run dev
 ```
 
-Open the URL Vite prints (e.g., http://localhost:5173/).
+Open the URL Vite prints (e.g., `http://localhost:5173/`).
 
 ## Build
 
@@ -91,11 +143,12 @@ Outputs static files to `dist/`.
 
 ## Deploy
 
-### Option A — Custom subdomain (recommended)
+### Option A — Custom Subdomain (Recommended)
 
-Host at https://taxapp.thesolutiondesk.ca.
+Host at [taxapp.thesolutiondesk.ca](https://taxapp.thesolutiondesk.ca).
 
 **DNS:** add a CNAME record at your DNS provider
+
 - Name/Host: `taxapp`
 - Target/Value: `solutionsrme.github.io`
 - TTL: default/auto
@@ -115,14 +168,17 @@ export default defineConfig({
 ```
 
 **Permanent CNAME file (recommended):**
+
 Create `public/CNAME` containing:
-```
+
+```text
 taxapp.thesolutiondesk.ca
 ```
 
 Vite will include this in every build so Pages auto-detects the domain.
 
 **GitHub Pages settings:**
+
 - Repo → Settings → Pages → Custom domain: `taxapp.thesolutiondesk.ca`
 - Check "Enforce HTTPS"
 

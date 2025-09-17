@@ -7,10 +7,17 @@ pnpm-debug.log*
 lerna-debug.log*
 
 # Build outputs
-dist/
-dist-ssr/
+/dist
+/dist-ssr
 *.local
 .vite/
+
+# Docs folder (except for built files)
+/docs/*
+!/docs/index.html
+!/docs/assets/
+!/docs/CNAME
+!/docs/robots.txt
 
 # Environment variables
 .env
