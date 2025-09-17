@@ -94,3 +94,6 @@ jspm_packages/
 # Temporary folders
 tmp/
 temp/
+
+# Production environment variables
+.env.production
