@@ -1,0 +1,37 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Health Check</title>
+    <meta http-equiv="Content-Security-Policy" content="
+      default-src 'self';
+      script-src 'self' https://js.stripe.com;
+      connect-src 'self' https://api.stripe.com https://r.stripe.com;
+      frame-src https://js.stripe.com https://checkout.stripe.com;
+      img-src 'self' data: https://*.stripe.com;
+      style-src 'self' 'unsafe-inline';
+      base-uri 'self';
+      form-action 'self' https://checkout.stripe.com;">
+    <script async id="stripe-buy-button-js" src="https://js.stripe.com/v3/buy-button.js"></script>
+    <style>body{font-family:system-ui;background:#0b0f1a;color:#e8e8f0;padding:2rem}</style>
+  </head>
+  <body>
+    <h1>Stripe Widget Health</h1>
+    <p>If you see two Stripe buttons below, CSP and Stripe are working.</p>
+
+    <stripe-buy-button
+      buy-button-id="buy_btn_1S8OSIC8Z2peWf8Ukdi8XvvS"
+      publishable-key="pk_live_51RycmaC8Z2peWf8UJKHZEg6hCF2oWKv8znUzAgl2UdxLkTuHkkueL54BRkGg5qMmBg5gvp5DainqdIOfArJqkRsF00r1kridjS">
+    </stripe-buy-button>
+
+    <stripe-buy-button
+      buy-button-id="buy_btn_1S8ORPC8Z2peWf8Uevo9ocJN"
+      publishable-key="pk_live_51RycmaC8Z2peWf8UJKHZEg6hCF2oWKv8znUzAgl2UdxLkTuHkkueL54BRkGg5qMmBg5gvp5DainqdIOfArJqkRsF00r1kridjS">
+    </stripe-buy-button>
+
+    <p>Fallback links: 
+      <a href="https://buy.stripe.com/3cI3cubwodMD9fbcvh5AQ02" target="_blank" rel="noreferrer">Monthly</a> ·
+      <a href="https://buy.stripe.com/00weVc6c48sj1MJ7aX5AQ01" target="_blank" rel="noreferrer">Yearly</a>
+    </p>
+  </body>
+</html>
