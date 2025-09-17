@@ -64,7 +64,6 @@ jobs:
       run: npm run build:gh-pages
       env:
         VITE_CLERK_PUBLISHABLE_KEY: ${{ secrets.VITE_CLERK_PUBLISHABLE_KEY }}
-        VITE_LEMON_SQUEEZY_STORE_ID: ${{ secrets.VITE_LEMON_SQUEEZY_STORE_ID }}
     
     - name: Deploy to GitHub Pages
       if: github.ref == 'refs/heads/main'
