@@ -80,12 +80,12 @@ describe('Tax Calculator', () => {
       const item: LineItemInput = { amount: 3.50, category: 'Prepared food / restaurant' }
       const result = calculateLine(item, 'ON')
       
-      expect(result.amount).toBe(3.50)
-      expect(result.federalTax).toBe(0.175) // GST only
+      expect(result.amount).toBeCloseTo(3.50, 2)
+      expect(result.federalTax).toBeCloseTo(0.175, 3) // GST only
       expect(result.provincialTax).toBe(0)
       expect(result.hstTax).toBe(0)
-      expect(result.totalTax).toBe(0.175)
-      expect(result.grandTotal).toBe(3.675)
+      expect(result.totalTax).toBeCloseTo(0.175, 3)
+      expect(result.grandTotal).toBeCloseTo(3.675, 3)
     })
 
     it('should handle negative amounts by treating them as zero', () => {
@@ -151,9 +151,9 @@ describe('Tax Calculator', () => {
       expect(result.totals.subTotal).toBe(175)
       // Standard: 5 GST + 7 PST = 12
       // Groceries: 0
-      // Children's clothing in BC: 5 GST + 0 PST = 5 (PST exempt)
-      expect(result.totals.tax).toBe(17)
-      expect(result.totals.grandTotal).toBe(192)
+      // Children's clothing in BC: 5% GST only (PST exempt) = 1.25
+      expect(result.totals.tax).toBeCloseTo(13.25, 2)
+      expect(result.totals.grandTotal).toBeCloseTo(188.25, 2)
     })
 
     it('should handle Quebec QST calculation', () => {
