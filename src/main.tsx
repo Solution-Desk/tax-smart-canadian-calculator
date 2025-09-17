@@ -23,14 +23,9 @@ const publishableKey = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY;
 console.log('Environment:', import.meta.env.MODE);
 console.log('Base URL:', baseUrl);
 console.log('Clerk Key Present:', !!publishableKey);
-console.log('Lemon Squeezy Store ID:', import.meta.env.VITE_LEMON_SQUEEZY_STORE_ID);
 
 if (!publishableKey) {
   console.error('Missing Clerk Publishable Key. Please check your .env file');
-}
-
-if (!import.meta.env.VITE_LEMON_SQUEEZY_STORE_ID) {
-  console.warn('Lemon Squeezy Store ID not found. The upgrade functionality will not work.');
 }
 
 // Render the app

@@ -21,10 +21,7 @@ export default defineConfig(({ mode }) => {
       'process.env': {},
       'import.meta.env': {
         ...env,
-        VITE_CLERK_PUBLISHABLE_KEY: JSON.stringify(env.VITE_CLERK_PUBLISHABLE_KEY || ''),
-        VITE_LEMON_SQUEEZY_STORE_ID: JSON.stringify(env.VITE_LEMON_SQUEEZY_STORE_ID || ''),
-        VITE_LEMON_SQUEEZY_MONTHLY_VARIANT: JSON.stringify(env.VITE_LEMON_SQUEEZY_MONTHLY_VARIANT || ''),
-        VITE_LEMON_SQUEEZY_YEARLY_VARIANT: JSON.stringify(env.VITE_LEMON_SQUEEZY_YEARLY_VARIANT || '')
+        VITE_CLERK_PUBLISHABLE_KEY: JSON.stringify(env.VITE_CLERK_PUBLISHABLE_KEY || '')
       }
     },
     resolve: {
