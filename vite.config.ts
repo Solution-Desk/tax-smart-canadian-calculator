@@ -11,7 +11,7 @@ export default defineConfig(({ mode }) => {
   
   return {
     plugins: [react()],
-    base: isProduction ? '/' : '/',
+    base: isProduction ? 'https://taxapp.thesolutiondesk.ca/' : '/',
     test: {
       globals: true,
       environment: 'jsdom',
