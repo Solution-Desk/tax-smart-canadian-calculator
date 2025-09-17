@@ -7,6 +7,7 @@
     "dev": "vite",
     "build": "vite build",
     "build:gh-pages": "vite build --base=/tax-smart-canadian-calculator/",
+    "prebuild": "node scripts/generate-build-info.js",
     "preview": "vite preview",
     "test": "vitest",
     "deploy": "npm run build:gh-pages && gh-pages -d dist"
