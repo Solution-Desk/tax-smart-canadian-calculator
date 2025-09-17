@@ -7,7 +7,7 @@ on:
     branches: [ main ]
 
 permissions:
-  contents: read
+  contents: write  # Changed from read to write to allow pushing to gh-pages
   pages: write
   id-token: write
   security-events: write
@@ -72,6 +72,9 @@ jobs:
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
         publish_dir: ./dist
+        force_orphan: true  # This ensures a clean deployment each time
+        user_name: 'github-actions[bot]'
+        user_email: 'github-actions[bot]@users.noreply.github.com'
 
   security-scan:
     runs-on: ubuntu-latest
