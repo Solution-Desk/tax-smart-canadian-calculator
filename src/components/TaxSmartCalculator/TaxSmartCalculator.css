@@ -253,7 +253,7 @@
 }
 
 .preset-select option {
-  background: var(--surface);
+  background: var(--surface-raised);
   color: var(--text-primary);
   padding: 8px;
 }
