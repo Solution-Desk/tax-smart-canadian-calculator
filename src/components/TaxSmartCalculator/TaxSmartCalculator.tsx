@@ -489,7 +489,7 @@ export default function TaxSmartCalculator() {
           <div className="line-items-actions">
             <div className="preset-dropdown">
               <select
-                className="preset-select"
+                className="input preset-select"
                 onChange={(e) => {
                   const presetId = e.target.value;
                   if (presetId) {
