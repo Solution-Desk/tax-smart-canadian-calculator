@@ -16,6 +16,7 @@ import { useDarkMode } from "../../hooks/useDarkMode"
 import { useLocalStorage } from "../../hooks/useAutoCalc"
 import { TAX_PRESETS } from "../../lib/taxPresets"
 import { Sparkles } from 'lucide-react'
+import { Modal } from '../Modal'
 import "./TaxSmartCalculator.css"
 
 type LineItemForm = {
@@ -26,6 +27,10 @@ type LineItemForm = {
 }
 
 const CURRENCY = new Intl.NumberFormat('en-CA', { style: 'currency', currency: 'CAD' })
+const PERCENT_FORMATTER = new Intl.NumberFormat('en-CA', {
+  minimumFractionDigits: 2,
+  maximumFractionDigits: 2,
+})
 const CONTACT_EMAIL = 'taxapp@thesolutiondesk.ca'
 const SPONSOR_URL = 'https://github.com/Solution-Desk?tab=sponsors'
 
@@ -81,6 +86,10 @@ function formatCurrency(value: number) {
   return CURRENCY.format(value)
 }
 
+function formatPercent(value: number) {
+  return `${PERCENT_FORMATTER.format(value * 100)}%`
+}
+
 async function copyToClipboard(value: string) {
   if (typeof navigator !== 'undefined' && navigator.clipboard?.writeText) {
     try {
@@ -109,6 +118,8 @@ export default function TaxSmartCalculator() {
   const [notice, setNotice] = useState<string | null>(null)
   const [resultsVersion, setResultsVersion] = useState(0)
   const [emailNotice, setEmailNotice] = useState<string | null>(null)
+  const [isPremiumModalOpen, setPremiumModalOpen] = useState(false)
+  const [isReferencesModalOpen, setReferencesModalOpen] = useState(false)
   const emailNoticeTimeoutRef = useRef<ReturnType<typeof window.setTimeout>>()
   const noticeTimeoutRef = useRef<ReturnType<typeof window.setTimeout>>()
 
@@ -267,18 +278,104 @@ export default function TaxSmartCalculator() {
           </div>
         </div>
         <div className="header-actions">
-          <span className="badge">
+          <button
+            type="button"
+            className="badge-button"
+            onClick={() => setPremiumModalOpen(true)}
+            aria-haspopup="dialog"
+            aria-expanded={isPremiumModalOpen}
+          >
             <Sparkles className="h-3.5 w-3.5" aria-hidden />
             <span>Premium coming soon</span>
-          </span>
+          </button>
+          <button
+            type="button"
+            className="btn ghost header-reference-btn"
+            onClick={() => setReferencesModalOpen(true)}
+            aria-haspopup="dialog"
+            aria-expanded={isReferencesModalOpen}
+          >
+            References
+          </button>
           <button type="button" className="btn whitespace-nowrap" onClick={toggleTheme}>
             {theme === 'dark' ? 'Light mode' : 'Dark mode'}
           </button>
         </div>
       </header>
 
+      <Modal
+        isOpen={isPremiumModalOpen}
+        onClose={() => setPremiumModalOpen(false)}
+        title="Premium features coming soon"
+      >
+        <p className="modal-lead">
+          Premium unlocks planning tools for non-essential purchases – restaurant meals, alcohol,
+          recreational cannabis, and more. We’re polishing the experience before launch.
+        </p>
+        <ul className="modal-feature-list">
+          {COMING_SOON_FEATURES.map((feature) => (
+            <li key={feature.title}>
+              <p className="feature-title">{feature.title}</p>
+              <p className="feature-copy">{feature.description}</p>
+            </li>
+          ))}
+        </ul>
+        <p className="modal-footnote">
+          Premium categories waiting in the wings: prepared food, snack foods, sweetened beverages,
+          recreational cannabis, and alcohol.
+        </p>
+      </Modal>
+
+      <Modal
+        isOpen={isReferencesModalOpen}
+        onClose={() => setReferencesModalOpen(false)}
+        title="Tax references"
+      >
+        <p className="modal-lead">
+          Every rule in TaxSmart is based on current federal or provincial publications. Use the
+          links below to verify details for your province.
+        </p>
+        <ul className="modal-reference-list">
+          <li>
+            <a href="https://www.canada.ca/en/revenue-agency/services/tax/businesses/topics/gst-hst-businesses/charge-collect-type-supply.html" target="_blank" rel="noreferrer">
+              CRA: Charge & collect GST/HST by type of supply
+            </a>
+          </li>
+          <li>
+            <a href="https://www.canada.ca/en/revenue-agency/services/forms-publications/publications/gi-063.html" target="_blank" rel="noreferrer">
+              CRA GI-063: Ontario point-of-sale rebates (children's goods, books, diapers, car seats)
+            </a>
+          </li>
+          <li>
+            <a href="https://www.canada.ca/en/revenue-agency/services/forms-publications/publications/gi-060.html" target="_blank" rel="noreferrer">
+              CRA GI-060: Ontario point-of-sale rebate on newspapers
+            </a>
+          </li>
+          <li>
+            <a href="https://www2.gov.bc.ca/gov/content/taxes/sales-taxes/pst" target="_blank" rel="noreferrer">
+              BC PST overview & exemptions
+            </a>
+          </li>
+          <li>
+            <a href="https://www.canada.ca/en/revenue-agency/services/forms-publications/publications/rc4022.html" target="_blank" rel="noreferrer">
+              CRA RC4022: GST/HST supplies (taxable, zero-rated, and exempt)
+            </a>
+          </li>
+          <li>
+            <a href="https://www.gov.mb.ca/finance/taxation/taxes/retail.html" target="_blank" rel="noreferrer">
+              Manitoba RST exemptions (incl. children's clothing)
+            </a>
+          </li>
+          <li>
+            <a href="https://www.revenuquebec.ca/en/" target="_blank" rel="noreferrer">
+              Revenu Québec: QST exemptions (books, baby products)
+            </a>
+          </li>
+        </ul>
+      </Modal>
+
       {notice && (
-        <div role="status" className="calculator-notice">
+        <div role="status" aria-live="polite" className="calculator-notice">
           {notice}
         </div>
       )}
@@ -314,11 +411,11 @@ export default function TaxSmartCalculator() {
             <div className="rate-cards">
               <div className="rate-card">
                 <p className="muted">Federal (GST)</p>
-                <p className="rate-value">{(TAX_RATES[province].gst * 100).toFixed(1)}%</p>
+                <p className="rate-value">{formatPercent(TAX_RATES[province].gst)}</p>
               </div>
               <div className="rate-card">
                 <p className="muted">Provincial ({provincialLabel})</p>
-                <p className="rate-value">{provincialRate ? `${(provincialRate * 100).toFixed(2)}%` : '—'}</p>
+                <p className="rate-value">{provincialRate ? formatPercent(provincialRate) : '—'}</p>
               </div>
             </div>
           </div>
@@ -416,33 +513,14 @@ export default function TaxSmartCalculator() {
               </select>
               <span className="dropdown-arrow">▼</span>
             </div>
-            <button type="button" className="btn ghost" onClick={handleAddItem}>
-              + Add Custom Item
-            </button>
             <button type="button" className="btn primary" onClick={handleCalculate}>
               Calculate tax
             </button>
           </div>
-        </section>
-
-        <section className="panel">
-          <div className="panel-header">
-            <h2 className="panel-title flex items-center gap-2">
-              <Sparkles className="h-6 w-6 text-amber-500" aria-hidden />
-              <span>Premium features coming soon</span>
-            </h2>
-          </div>
-          <p className="panel-subtitle">
-            We pressed pause on paid plans while we polish the experience. Here’s what will launch when subscriptions open up.
+          <p className="line-items-note" role="note">
+            Custom multi-item presets arrive with premium. Edit any row above or use a preset to
+            add essentials.
           </p>
-          <ul className="space-y-3">
-            {COMING_SOON_FEATURES.map((feature) => (
-              <li key={feature.title} className="rounded-xl border border-dashed border-amber-400/60 bg-amber-500/5 p-4">
-                <p className="font-semibold text-amber-700 dark:text-amber-200">{feature.title}</p>
-                <p className="text-sm text-amber-800/80 dark:text-amber-100/70">{feature.description}</p>
-              </li>
-            ))}
-          </ul>
         </section>
 
         <section key={resultsVersion} className="panel">
@@ -491,53 +569,9 @@ export default function TaxSmartCalculator() {
         </section>
 
         <section className="panel">
-          <h2 className="panel-title">References</h2>
-          <ul className="reference-list">
-            <li>
-              <a href="https://www.canada.ca/en/revenue-agency/services/tax/businesses/topics/gst-hst-businesses/charge-collect-type-supply.html" target="_blank" rel="noreferrer">
-                CRA: Charge & collect GST/HST by type of supply
-              </a>
-            </li>
-            <li>
-              <a href="https://www.canada.ca/en/revenue-agency/services/forms-publications/publications/gi-063.html" target="_blank" rel="noreferrer">
-                CRA GI-063: Ontario point-of-sale rebates (children's goods, books, diapers, car seats)
-              </a>
-            </li>
-            <li>
-              <a href="https://www.canada.ca/en/revenue-agency/services/forms-publications/publications/gi-060.html" target="_blank" rel="noreferrer">
-                CRA GI-060: Ontario point-of-sale rebate on newspapers
-              </a>
-            </li>
-            <li>
-              <a href="https://www2.gov.bc.ca/gov/content/taxes/sales-taxes/pst" target="_blank" rel="noreferrer">
-                BC PST overview & exemptions
-              </a>
-            </li>
-            <li>
-              <a href="https://www.canada.ca/en/revenue-agency/services/forms-publications/publications/rc4022.html" target="_blank" rel="noreferrer">
-                CRA RC4022: GST/HST supplies (taxable, zero-rated, and exempt)
-              </a>
-            </li>
-            <li>
-              <a href="https://www.gov.mb.ca/finance/taxation/taxes/retail.html" target="_blank" rel="noreferrer">
-                Manitoba RST exemptions (incl. children's clothing)
-              </a>
-            </li>
-            <li>
-              <a href="https://www.revenuquebec.ca/en/" target="_blank" rel="noreferrer">
-                Revenu Québec: QST exemptions (books, baby products)
-              </a>
-            </li>
-          </ul>
-          <p className="muted">
-            Excise duties or deposits on alcohol, tobacco, cannabis, and containers are not included.
-          </p>
-        </section>
-
-        <section className="panel">
           <h2 className="panel-title">Need help or have ideas?</h2>
           <p>
-            Spot a rate mismatch, want a new workflow shortcut, or need a second set of eyes on your numbers?
+            Spot a rate mismatch, want a new feature, or need a second set of eyes on your numbers?
             Reach us at the address below and we’ll get back within one business day.
           </p>
           <div className="contact-email-group">
@@ -549,14 +583,6 @@ export default function TaxSmartCalculator() {
               <span className="email-notice" role="status">{emailNotice}</span>
             )}
           </div>
-          <a
-            className="btn primary feedback-sponsor"
-            href={SPONSOR_URL}
-            target="_blank"
-            rel="noreferrer"
-          >
-            Support us on GitHub Sponsors
-          </a>
         </section>
       </main>
 
