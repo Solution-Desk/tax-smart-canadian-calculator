@@ -1,61 +1,26 @@
 # TaxSmart · Canadian Sales-Tax Calculator
 
-A modern GST/HST/PST/QST calculator built for Canadian operators, accountants, and teams that need quick answers without spinning up spreadsheets.
+Visit the live experience at **https://taxapp.thesolutiondesk.ca** for an always up-to-date view of Canadian GST/HST/PST/QST calculations.
 
-## Live Site
-- Production: https://taxapp.thesolutiondesk.ca
-- Status page: https://taxapp.thesolutiondesk.ca/health.html
+## What You’ll See
+- Province-aware totals sourced from current CRA and provincial guidance.
+- Category presets that cover common retail, professional, and goods scenarios.
+- Copy/share tools that let you hand off quotes without spreadsheets or screenshots.
+- Dark and light themes that respond to your system preference.
 
-## Core Capabilities
-- Province-aware calculations with CRA-backed tax tables.
-- Category presets for common goods and services.
-- Shareable URLs so collaborators can review the same configuration.
-- Dark/light themes with responsive layout for desktop and mobile.
-
-## Getting Started
-
-### Prerequisites
-- Node.js 18 or newer
-- npm 9+
-
-### Installation
-```bash
-git clone https://github.com/Solution-Desk/tax-smart-canadian-calculator.git
-cd tax-smart-canadian-calculator
-npm install
-```
-
-### Development
-```bash
-npm run dev
-```
-Open the Vite dev URL (default http://localhost:5173) to make changes with hot reload.
-
-### Production Build
-```bash
-npm run build
-```
-The optimized assets live in `dist/`. Preview the build locally with:
-```bash
-npm run preview
-```
-
-### Deployment
-Use the helper script to produce the GitHub Pages payload:
-```bash
-./gh-pages-deploy.sh
-```
-The script rebuilds the app and refreshes the `docs/` folder (the Pages publishing source). Commit and push the changes to update https://taxapp.thesolutiondesk.ca.
+## Why Teams Use TaxSmart
+- **Accuracy:** We highlight the applicable federal + provincial rates per line, eliminating guesswork.
+- **Speed:** Add or remove items in seconds and watch totals update instantly.
+- **Collaboration:** Share a single link so teammates or clients can review the exact configuration you prepared.
+- **Access:** No account required for the core calculator; it just works on desktop, tablet, and mobile.
 
 ## Premium Roadmap
-Premium add-ons are in private beta. Join the waitlist by emailing [taxapp@thesolutiondesk.ca](mailto:taxapp@thesolutiondesk.ca) with your use case, and we’ll share release updates directly.
+Paid add-ons are in private beta. Drop a note to [taxapp@thesolutiondesk.ca](mailto:taxapp@thesolutiondesk.ca) with your use case to join the waitlist or learn about partnership opportunities.
 
-## Support
+## Need a Hand?
 - Email: [taxapp@thesolutiondesk.ca](mailto:taxapp@thesolutiondesk.ca)
-- Issues: https://github.com/Solution-Desk/tax-smart-canadian-calculator/issues
+- Status page: https://taxapp.thesolutiondesk.ca/health.html
 
-## Contributing
-We welcome improvements! Review [`CONTRIBUTING.md`](CONTRIBUTING.md) for coding guidelines and the preferred pull-request workflow.
+---
 
-## License
-MIT — see [`LICENSE`](LICENSE) for details.
+Developers looking to contribute can head to [`CONTRIBUTING.md`](CONTRIBUTING.md) for the full build-and-release workflow. The public site remains the source of truth for end users.
