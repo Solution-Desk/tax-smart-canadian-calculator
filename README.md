@@ -1,17 +1,17 @@
 # TaxSmart · Canadian Sales-Tax Calculator
 
-Visit the live experience at **https://taxapp.thesolutiondesk.ca** for an always up-to-date view of Canadian GST/HST/PST/QST calculations.
+Visit the live experience at **https://taxapp.thesolutiondesk.ca** for an always up-to-date view of Canadian GST/HST/PST/QST calculations tailored for individuals.
 
 ## What You’ll See
 - Province-aware totals sourced from current CRA and provincial guidance.
 - Category presets that cover common retail, professional, and goods scenarios.
-- Copy/share tools that let you hand off quotes without spreadsheets or screenshots.
+- Copy/share tools that let you hand off calculations without spreadsheets or screenshots.
 - Dark and light themes that respond to your system preference.
 
-## Why Teams Use TaxSmart
-- **Accuracy:** We highlight the applicable federal + provincial rates per line, eliminating guesswork.
+## Why Individuals Use TaxSmart
+- **Accuracy:** See the applicable federal + provincial rates per line, eliminating guesswork when budgeting or comparing offers.
 - **Speed:** Add or remove items in seconds and watch totals update instantly.
-- **Collaboration:** Share a single link so teammates or clients can review the exact configuration you prepared.
+- **Sharing:** Copy a link so family members or advisors can review the exact scenario you prepared.
 - **Access:** No account required for the core calculator; it just works on desktop, tablet, and mobile.
 
 ## Premium Roadmap

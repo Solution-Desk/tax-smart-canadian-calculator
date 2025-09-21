@@ -1,10 +1,11 @@
 # About TaxSmart
 
-TaxSmart helps Canadian teams answer sales-tax questions quickly by combining federal and provincial rules in a single, shareable interface.
+TaxSmart helps Canadians calculate personal sales taxes quickly by combining federal and provincial rules in a single, shareable interface.
 
 ## Why It Exists
 - **Clarity:** Sales-tax treatment shifts by province and category. TaxSmart keeps the references in one place so you don’t have to memorize CRA bulletins.
-- **Collaboration:** Quotes can be shared with a link instead of screenshots or spreadsheets.
+- **Clarity for individuals:** Plan purchases, compare big-ticket items, or split receipts with confidence.
+- **Shareable:** Send a link to family members or advisors instead of screenshots or spreadsheets.
 - **Focus:** A lightweight front-end means fast load times and no account requirement for core functionality.
 
 ## Product Principles

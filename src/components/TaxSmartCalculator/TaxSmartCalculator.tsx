@@ -37,7 +37,7 @@ const SPONSOR_IFRAME_PROPS = {
 const COMING_SOON_FEATURES = [
   {
     title: 'Saved presets & projects',
-    description: 'Store favourite configurations so repeat quotes take seconds, not minutes.',
+    description: 'Store favourite configurations so repeat calculations take seconds, not minutes.',
   },
   {
     title: 'Unlimited line items',
@@ -53,7 +53,7 @@ const COMING_SOON_FEATURES = [
   },
   {
     title: 'Private share links (30 days)',
-    description: 'Lock down sensitive quotes with expiring, access-controlled links.',
+    description: 'Lock down sensitive details with expiring, access-controlled links.',
   },
   {
     title: 'Priority support & early previews',
@@ -488,7 +488,7 @@ export default function TaxSmartCalculator() {
         <section className="panel">
           <h2 className="panel-title">Need help or have ideas?</h2>
           <p>
-            Spot a rate mismatch, want a new workflow shortcut, or need a second set of eyes on your quote?
+            Spot a rate mismatch, want a new workflow shortcut, or need a second set of eyes on your numbers?
             Reach us at the address below and we’ll get back within one business day.
           </p>
           <div className="contact-email-group">

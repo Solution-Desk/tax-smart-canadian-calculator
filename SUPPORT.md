@@ -1,6 +1,6 @@
 # Support
 
-Thanks for using TaxSmart! Here’s how to get help or contact the team.
+Thanks for using TaxSmart! Here’s how to get help or contact us.
 
 ## Self-Service
 - Review the [`README`](README.md) for setup instructions.
