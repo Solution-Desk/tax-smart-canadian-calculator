@@ -13,9 +13,10 @@ fi
 echo "Building project..."
 npm run build
 
-# Clean up docs directory
+# Prepare docs directory for GitHub Pages
 echo "Preparing files..."
-rm -rf docs/*
+rm -rf docs
+mkdir -p docs
 
 # Copy built files to docs directory
 cp -r dist/* docs/

@@ -1,225 +1,61 @@
-# Canada Tax Smart Calculator
+# TaxSmart · Canadian Sales-Tax Calculator
 
-A modern, responsive Canadian tax calculator that helps you calculate GST/HST/PST/QST with per-province overrides.
+A modern GST/HST/PST/QST calculator built for Canadian operators, accountants, and teams that need quick answers without spinning up spreadsheets.
 
-## Features
+## Live Site
+- Production: https://taxapp.thesolutiondesk.ca
+- Status page: https://taxapp.thesolutiondesk.ca/health.html
 
-- Calculate Canadian sales taxes (GST/HST/PST/QST)
-- Province-specific tax rates
-- Shareable calculation links
-- Responsive design
+## Core Capabilities
+- Province-aware calculations with CRA-backed tax tables.
+- Category presets for common goods and services.
+- Shareable URLs so collaborators can review the same configuration.
+- Dark/light themes with responsive layout for desktop and mobile.
 
 ## Getting Started
 
 ### Prerequisites
-
-- Node.js 16+ and npm
+- Node.js 18 or newer
+- npm 9+
 
 ### Installation
-
-1. Clone the repository:
-
-   ```bash
-   git clone https://github.com/Solution-Desk/tax-smart-canadian-calculator.git
-   cd tax-smart-canadian-calculator
-   ```
-
-2. Install dependencies:
-
-   ```bash
-   npm install
-   ```
+```bash
+git clone https://github.com/Solution-Desk/tax-smart-canadian-calculator.git
+cd tax-smart-canadian-calculator
+npm install
+```
 
 ### Development
-
-Start the development server:
-
 ```bash
 npm run dev
 ```
+Open the Vite dev URL (default http://localhost:5173) to make changes with hot reload.
 
-### Building for Production
-
-Build the project:
-
+### Production Build
 ```bash
 npm run build
+```
+The optimized assets live in `dist/`. Preview the build locally with:
+```bash
+npm run preview
 ```
 
 ### Deployment
-
-Deploy to GitHub Pages:
-
+Use the helper script to produce the GitHub Pages payload:
 ```bash
-npm run deploy
+./gh-pages-deploy.sh
 ```
+The script rebuilds the app and refreshes the `docs/` folder (the Pages publishing source). Commit and push the changes to update https://taxapp.thesolutiondesk.ca.
 
+## Premium Roadmap
+Premium add-ons are in private beta. Join the waitlist by emailing [taxapp@thesolutiondesk.ca](mailto:taxapp@thesolutiondesk.ca) with your use case, and we’ll share release updates directly.
 
-## Live URL
-
-Recommended: Host at [taxapp.thesolutiondesk.ca](https://taxapp.thesolutiondesk.ca) (subdomain of your site).
-
-If you prefer GitHub's default domain instead, you can use:
-[GitHub Pages](https://solutionsrme.github.io/canada-tax-smart-calc/)
-
-## Product Overview
-
-### Free Categories (Always Available)
-
-- Standard
-- Zero-rated (basic groceries)
-- Children's clothing & footwear
-- Children's diapers
-- Children's car seats & booster seats
-- Feminine hygiene products
-- Prescription drugs / medical
-- Public transit fares
-- Printed books (qualifying) & Newspapers (qualifying)
-- Exempt / GST only / Provincial only (overrides)
-
-### Premium (Gated Categories)
-
-- Prepared food / restaurant
-- Snack foods / candy
-- Sweetened carbonated beverages
-- Cannabis (non-medical)
-- Tobacco / alcohol
-
-### Free Features
-
-- Unlimited calculations (no account)
-- Share link (encodes line items)
-- Copy totals
-- One local preset (browser)
-- Dark mode
-- Transparent **References** list
-
-### Pro Features (Suggested)
-
-- PDF & CSV export
-- Unlimited presets & per-client projects
-- Batch import (CSV)
-- Multi-currency display
-- "Audit footnotes" (which rule triggered)
-
-> **Scope:** This app models GST/HST/PST/QST at checkout. Excise duties/markups (alcohol, tobacco, cannabis) and deposits/levies are **not** included.
-
----
-
-## Pricing (recommended)
-
-- **Pro: CA$19.99/year** (headline) or **CA$3.49/month**
-- Optional **Supporter: CA$24.99/year** (same features; helps fund the free essentials)
-- Essentials remain free for everyone — promo room for special offers (e.g., “Founding year CA$14.99”)
-
-You can adjust these copy/values in the paywall later.
-
-### Money-making potential (quick model)
-
-- Paywall views from visitors: ~5% (triggered when selecting a premium category or exporting)
-
----
-
-## Tech stack
-
-- Vite + React (TypeScript)
-- Lightweight CSS (`src/index.css`)
-- Pure static build → GitHub Pages (or any static host)
-
----
-
-## Local Development
-
-```bash
-npm i
-npm run dev
-```
-
-Open the URL Vite prints (e.g., `http://localhost:5173/`).
-
-## Build
-
-```bash
-npm run build
-```
-
-Outputs static files to `dist/`.
-
-## Deploy
-
-### Option A — Custom Subdomain (Recommended)
-
-Host at [taxapp.thesolutiondesk.ca](https://taxapp.thesolutiondesk.ca).
-
-**DNS:** add a CNAME record at your DNS provider
-
-- Name/Host: `taxapp`
-- Target/Value: `solutionsrme.github.io`
-- TTL: default/auto
-- (Cloudflare: set to DNS only / grey cloud)
-
-**Vite base path:** custom domain serves at the root → set base to `/`
-
-```typescript
-// vite.config.ts
-import { defineConfig } from 'vite'
-import react from '@vitejs/plugin-react'
-
-export default defineConfig({
-  plugins: [react()],
-  base: '/', // custom domain -> root path
-})
-```
-
-**Permanent CNAME file (recommended):**
-
-Create `public/CNAME` containing:
-
-```text
-taxapp.thesolutiondesk.ca
-```
-
-Vite will include this in every build so Pages auto-detects the domain.
-
-**GitHub Pages settings:**
-
-- Repo → Settings → Pages → Custom domain: `taxapp.thesolutiondesk.ca`
-- Check "Enforce HTTPS"
-
-- Rates/rules are implemented to the best of our knowledge and linked to CRA/provincial references.
-- **Not legal/tax advice.** Validate for your use case and keep rules up to date for your deployment.
-
-## Testing
-
-We're building out a Vitest suite with golden cases per province and category. Contributions welcome — see Contributing.
-
-## Roadmap
-
-- **Pro:** multi‑province comparison, CSV/PDF export, saved templates, private share links
-- **Pro:** per‑user workspaces and entitlement checks  
-- **Data:** effective‑date ranges for rules + changelog PR bot
-- **Accessibility:** keyboard table navigation and WCAG 2.1 AA audits
+## Support
+- Email: [taxapp@thesolutiondesk.ca](mailto:taxapp@thesolutiondesk.ca)
+- Issues: https://github.com/Solution-Desk/tax-smart-canadian-calculator/issues
 
 ## Contributing
-
-PRs are welcome.
-
-- Keep business logic in `src/lib`, UI in `src/components`, shared concerns as hooks.
-- Include links to CRA/provincial sources when changing tax rules.
-- Run `npm run build` before opening a PR and fill in the PR template.
-- Be kind — we follow the Code of Conduct.
-
-See: [`CONTRIBUTING.md`](CONTRIBUTING.md), [`CODE_OF_CONDUCT.md`](CODE_OF_CONDUCT.md).
-
-## Security & privacy
-
-- **Static SPA:** no server, no accounts, no telemetry by default
-- If you discover a vulnerability, please follow [`SECURITY.md`](SECURITY.md) for responsible disclosure
+We welcome improvements! Review [`CONTRIBUTING.md`](CONTRIBUTING.md) for coding guidelines and the preferred pull-request workflow.
 
 ## License
-
-MIT — see [`LICENSE`](LICENSE).
-
-## Acknowledgements
-
-Thanks to Canadian merchants, accountants, and developers who contributed test cases and references. ❤️
+MIT — see [`LICENSE`](LICENSE) for details.

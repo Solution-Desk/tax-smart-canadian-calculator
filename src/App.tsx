@@ -1,5 +1,4 @@
 import React from 'react';
-import { AuthWrapper } from './components/AuthWrapper';
 import { Footer } from './components/Footer';
 import ErrorBoundary from './ErrorBoundary';
 import TaxSmartCalculator from './components/TaxSmartCalculator/TaxSmartCalculator';
@@ -26,14 +25,12 @@ const ErrorFallback = () => (
 export default function App() {
   return (
     <div className="app-container">
-      <AuthWrapper>
-        <ErrorBoundary fallback={<ErrorFallback />}>
-          <main className="main-content">
-            <TaxSmartCalculator />
-          </main>
-          <Footer />
-        </ErrorBoundary>
-      </AuthWrapper>
+      <ErrorBoundary fallback={<ErrorFallback />}>
+        <main className="main-content">
+          <TaxSmartCalculator />
+        </main>
+        <Footer />
+      </ErrorBoundary>
     </div>
   );
 }

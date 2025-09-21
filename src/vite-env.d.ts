@@ -4,7 +4,6 @@
 declare module 'vite' {
   interface ImportMetaEnv {
     // Your custom environment variables
-    readonly VITE_CLERK_PUBLISHABLE_KEY: string;
     readonly VITE_BASE_URL: string;
   }
 }

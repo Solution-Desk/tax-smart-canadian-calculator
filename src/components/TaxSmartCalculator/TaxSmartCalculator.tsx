@@ -8,17 +8,13 @@ import {
   TAX_RATES,
   getProvincialLabel,
   getProvincialRate,
-  PRO_ONLY_CATEGORIES,
 } from "../../lib/taxData"
 import { LineItemInput, calculateTotals, validateCategory } from "../../lib/taxCalculator"
 import { encodeState, extractStateFromHash } from "../../lib/share"
 import { useDarkMode } from "../../hooks/useDarkMode"
 import { useLocalStorage } from "../../hooks/useAutoCalc"
 import { TAX_PRESETS } from "../../lib/taxPresets"
-import { SignedIn, SignedOut, SignInButton, UserButton } from '@clerk/clerk-react'
-import { Crown } from 'lucide-react'
-import { PricingModal } from '../PricingModal'
-import { usePlanStatus } from '../../hooks/useEntitlements'
+import { Sparkles } from 'lucide-react'
 import "./TaxSmartCalculator.css"
 
 type LineItemForm = {
@@ -37,6 +33,33 @@ const SPONSOR_IFRAME_PROPS = {
   height: 32,
   width: 114,
 }
+
+const COMING_SOON_FEATURES = [
+  {
+    title: 'Saved presets & projects',
+    description: 'Store favourite configurations so repeat quotes take seconds, not minutes.',
+  },
+  {
+    title: 'Unlimited line items',
+    description: 'Remove the cap for complex invoices and detailed cost breakdowns.',
+  },
+  {
+    title: 'CSV & PDF export',
+    description: 'Send polished summaries to clients or plug totals into your billing tools.',
+  },
+  {
+    title: 'Batch import (CSV)',
+    description: 'Upload spreadsheet estimates and calculate tax on every row automatically.',
+  },
+  {
+    title: 'Private share links (30 days)',
+    description: 'Lock down sensitive quotes with expiring, access-controlled links.',
+  },
+  {
+    title: 'Priority support & early previews',
+    description: 'Get front-of-queue help plus sneak peeks at new automation upgrades.',
+  },
+];
 
 function createLineItem(index: number, overrides: Partial<LineItemForm> = {}): LineItemForm {
   return {
@@ -80,12 +103,10 @@ function toShareableItems(items: LineItemForm[]) {
 
 export default function TaxSmartCalculator() {
   const { theme, toggleTheme } = useDarkMode('dark');
-  const [showUpgradeModal, setShowUpgradeModal] = useState(false);
   const [province, setProvince] = useLocalStorage<Province>('taxapp:province', DEFAULT_PROVINCE)
   const [items, setItems] = useState<LineItemForm[]>([createLineItem(1)])
   const [notice, setNotice] = useState<string | null>(null)
   const [resultsVersion, setResultsVersion] = useState(0)
-  const { isPro } = usePlanStatus()
 
   const numericItems = useMemo<LineItemInput[]>(
     () => items.map((item) => ({ amount: parseAmount(item.amount), category: item.category })),
@@ -129,14 +150,8 @@ export default function TaxSmartCalculator() {
   }, [])
 
   const handleUpdateItem = useCallback((id: string, patch: Partial<LineItemForm>) => {
-    if (patch.category && !isPro && PRO_ONLY_CATEGORIES.includes(patch.category as Category)) {
-      showNotice('Upgrade to Pro to use that category');
-      setShowUpgradeModal(true);
-      return;
-    }
-
     setItems((current) => current.map((item) => (item.id === id ? { ...item, ...patch } : item)))
-  }, [isPro, showNotice, setShowUpgradeModal])
+  }, [])
 
   const handleCalculate = useCallback(() => {
     setResultsVersion((version) => version + 1)
@@ -188,16 +203,13 @@ export default function TaxSmartCalculator() {
         ? state.items.map((item, index) =>
             createLineItem(index + 1, {
               label: item.label,
-              category: (() => {
-                const normalised = validateCategory(item.category)
-                return !isPro && PRO_ONLY_CATEGORIES.includes(normalised) ? 'Standard' : normalised
-              })(),
+              category: validateCategory(item.category),
               amount: item.amount,
             })
           )
         : [createLineItem(1)],
     )
-  }, [isPro])
+  }, [])
 
   return (
     <div className="calculator-shell">
@@ -210,35 +222,15 @@ export default function TaxSmartCalculator() {
           </div>
         </div>
         <div className="header-actions">
+          <span className="badge">
+            <Sparkles className="h-3.5 w-3.5" aria-hidden />
+            <span>Premium coming soon</span>
+          </span>
           <button type="button" className="btn whitespace-nowrap" onClick={toggleTheme}>
             {theme === 'dark' ? 'Light mode' : 'Dark mode'}
           </button>
-          <button 
-            onClick={() => setShowUpgradeModal(true)}
-            className="btn whitespace-nowrap bg-gradient-to-r from-amber-400 to-amber-500 text-white border-transparent hover:from-amber-500 hover:to-amber-600 shadow-md hover:shadow-lg transition-all duration-200 transform hover:-translate-y-0.5"
-          >
-            <Crown className="h-3.5 w-3.5 inline-block mr-1.5" />
-            <span>Upgrade</span>
-          </button>
-          <SignedOut>
-            <SignInButton mode="modal">
-              <button className="btn whitespace-nowrap bg-indigo-600 text-white hover:bg-indigo-700 border-transparent">
-                Sign in
-              </button>
-            </SignInButton>
-          </SignedOut>
-          <SignedIn>
-            <div className="flex-shrink-0">
-              <UserButton afterSignOutUrl="/" />
-            </div>
-          </SignedIn>
         </div>
       </header>
-      
-      <PricingModal 
-        isOpen={showUpgradeModal} 
-        onClose={() => setShowUpgradeModal(false)} 
-      />
 
       {notice && (
         <div role="status" className="calculator-notice">
@@ -313,19 +305,11 @@ export default function TaxSmartCalculator() {
                   value={item.category}
                   onChange={(event) => handleUpdateItem(item.id, { category: event.target.value as Category })}
                 >
-                  {CATEGORY_OPTIONS.map((option) => {
-                    const requiresPro = PRO_ONLY_CATEGORIES.includes(option)
-                    return (
-                      <option
-                        key={option}
-                        value={option}
-                        disabled={!isPro && requiresPro}
-                      >
-                        {option}
-                        {!isPro && requiresPro ? ' (Pro)' : ''}
-                      </option>
-                    )
-                  })}
+                  {CATEGORY_OPTIONS.map((option) => (
+                    <option key={option} value={option}>
+                      {option}
+                    </option>
+                  ))}
                 </select>
                 <label className="sr-only" htmlFor={`amount-${item.id}`}>
                   Item amount
@@ -390,6 +374,26 @@ export default function TaxSmartCalculator() {
               Calculate tax
             </button>
           </div>
+        </section>
+
+        <section className="panel">
+          <div className="panel-header">
+            <h2 className="panel-title flex items-center gap-2">
+              <Sparkles className="h-6 w-6 text-amber-500" aria-hidden />
+              <span>Premium features coming soon</span>
+            </h2>
+          </div>
+          <p className="panel-subtitle">
+            We pressed pause on paid plans while we polish the experience. Here’s what will launch when subscriptions open up.
+          </p>
+          <ul className="space-y-3">
+            {COMING_SOON_FEATURES.map((feature) => (
+              <li key={feature.title} className="rounded-xl border border-dashed border-amber-400/60 bg-amber-500/5 p-4">
+                <p className="font-semibold text-amber-700 dark:text-amber-200">{feature.title}</p>
+                <p className="text-sm text-amber-800/80 dark:text-amber-100/70">{feature.description}</p>
+              </li>
+            ))}
+          </ul>
         </section>
 
         <section key={resultsVersion} className="panel">
