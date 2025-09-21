@@ -47,6 +47,14 @@ export const CATEGORY_OPTIONS: Category[] = [
   'Cannabis (medical)','Cannabis (non-medical)','Tobacco / alcohol','GST only','Provincial only'
 ]
 
+export const PREMIUM_CATEGORIES: ReadonlyArray<Category> = [
+  'Prepared food / restaurant',
+  'Snack foods / candy',
+  'Sweetened carbonated beverages',
+  'Cannabis (non-medical)',
+  'Tobacco / alcohol',
+]
+
 export const DEFAULT_PROVINCE: Province = 'BC'
 
 export function getProvincialLabel(kind: RateKind): string {

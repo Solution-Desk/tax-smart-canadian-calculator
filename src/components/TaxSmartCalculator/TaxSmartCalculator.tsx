@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import {
   CATEGORY_OPTIONS,
   Category,
@@ -8,6 +8,7 @@ import {
   TAX_RATES,
   getProvincialLabel,
   getProvincialRate,
+  PREMIUM_CATEGORIES,
 } from "../../lib/taxData"
 import { LineItemInput, calculateTotals, validateCategory } from "../../lib/taxCalculator"
 import { encodeState, extractStateFromHash } from "../../lib/share"
@@ -26,13 +27,7 @@ type LineItemForm = {
 
 const CURRENCY = new Intl.NumberFormat('en-CA', { style: 'currency', currency: 'CAD' })
 const CONTACT_EMAIL = 'taxapp@thesolutiondesk.ca'
-const SPONSOR_URL = 'https://github.com/sponsors/Solution-Desk'
-const SPONSOR_IFRAME_PROPS = {
-  src: 'https://github.com/sponsors/Solution-Desk/button',
-  title: 'Sponsor Solution-Desk',
-  height: 32,
-  width: 114,
-}
+const SPONSOR_URL = 'https://github.com/Solution-Desk?tab=sponsors'
 
 const COMING_SOON_FEATURES = [
   {
@@ -60,6 +55,12 @@ const COMING_SOON_FEATURES = [
     description: 'Get front-of-queue help plus sneak peeks at new automation upgrades.',
   },
 ];
+
+const PREMIUM_CATEGORY_SET = new Set(PREMIUM_CATEGORIES);
+
+function isPremiumCategory(category: Category) {
+  return PREMIUM_CATEGORY_SET.has(category);
+}
 
 function createLineItem(index: number, overrides: Partial<LineItemForm> = {}): LineItemForm {
   return {
@@ -107,6 +108,9 @@ export default function TaxSmartCalculator() {
   const [items, setItems] = useState<LineItemForm[]>([createLineItem(1)])
   const [notice, setNotice] = useState<string | null>(null)
   const [resultsVersion, setResultsVersion] = useState(0)
+  const [emailNotice, setEmailNotice] = useState<string | null>(null)
+  const emailNoticeTimeoutRef = useRef<ReturnType<typeof window.setTimeout>>()
+  const noticeTimeoutRef = useRef<ReturnType<typeof window.setTimeout>>()
 
   const numericItems = useMemo<LineItemInput[]>(
     () => items.map((item) => ({ amount: parseAmount(item.amount), category: item.category })),
@@ -123,42 +127,61 @@ export default function TaxSmartCalculator() {
 
   const showNotice = useCallback((message: string) => {
     setNotice(message)
-    window.setTimeout(() => setNotice(null), 1800)
+    if (noticeTimeoutRef.current) {
+      window.clearTimeout(noticeTimeoutRef.current)
+    }
+    noticeTimeoutRef.current = window.setTimeout(() => setNotice(null), 1800)
+  }, [])
+
+  const showEmailNotice = useCallback((message: string) => {
+    setEmailNotice(message)
+    if (emailNoticeTimeoutRef.current) {
+      window.clearTimeout(emailNoticeTimeoutRef.current)
+    }
+    emailNoticeTimeoutRef.current = window.setTimeout(() => setEmailNotice(null), 1800)
   }, [])
 
   const handleAddItem = useCallback((presetOrEvent?: (typeof TAX_PRESETS)[number] | React.MouseEvent) => {
-    // Handle case where it's called from a click event
     if (presetOrEvent && 'preventDefault' in presetOrEvent) {
       presetOrEvent.preventDefault();
       setItems((current) => [...current, createLineItem(current.length + 1)]);
       return;
     }
-    
-    // Handle case where it's called with a preset
+
     const preset = presetOrEvent as (typeof TAX_PRESETS)[number] | undefined;
+    if (preset?.category && isPremiumCategory(preset.category)) {
+      showNotice('Coming soon: premium items like dining, cannabis, and alcohol');
+      return;
+    }
+
     setItems((current) => [
-      ...current, 
+      ...current,
       createLineItem(current.length + 1, {
         label: preset?.label || '',
         category: preset?.category || 'Standard',
       })
     ]);
-  }, [])
+  }, [showNotice])
 
   const handleRemoveItem = useCallback((id: string) => {
     setItems((current) => (current.length > 1 ? current.filter((item) => item.id !== id) : current))
   }, [])
 
   const handleUpdateItem = useCallback((id: string, patch: Partial<LineItemForm>) => {
+    if (patch.category && isPremiumCategory(patch.category as Category)) {
+      showNotice('Coming soon: premium items like dining, cannabis, and alcohol');
+      return;
+    }
+
     setItems((current) => current.map((item) => (item.id === id ? { ...item, ...patch } : item)))
-  }, [])
+  }, [showNotice])
 
   const handleCalculate = useCallback(() => {
     setResultsVersion((version) => version + 1)
     showNotice('Totals refreshed')
   }, [showNotice])
 
-  const handleCopyShareLink = React.useCallback(async () => {
+  const handleCopyShareLink = useCallback(async () => {
     const parts = [
       `Province: ${province}`,
       `Subtotal: ${formatCurrency(totals.subTotal)}`,
@@ -172,7 +195,7 @@ export default function TaxSmartCalculator() {
     showNotice(success ? 'Results copied to clipboard' : 'Clipboard not available')
   }, [province, provincialLabel, showNotice, totals])
 
-  const handleCopyAppLink = React.useCallback(async () => {
+  const handleCopyAppLink = useCallback(async () => {
     if (typeof window === 'undefined') return
     const shareUrl = new URL(window.location.href)
     shareUrl.hash = encodeState({ province, items: toShareableItems(items) })
@@ -180,36 +203,58 @@ export default function TaxSmartCalculator() {
     showNotice(success ? 'Shareable link copied' : 'Clipboard not available')
   }, [items, province, showNotice])
 
-  const handleCopyEmail = React.useCallback(async () => {
+  const handleCopyEmail = useCallback(async () => {
     const success = await copyToClipboard(CONTACT_EMAIL)
     if (success) {
-      showNotice('Email copied to clipboard.')
+      showEmailNotice('Copied to clipboard')
       return
     }
 
+    showEmailNotice('Opening email app…')
     window.location.href = `mailto:${CONTACT_EMAIL}`
-  }, [showNotice])
+  }, [showEmailNotice])
 
   // Auto-calculated via useMemo with [numericItems, province] dependency
 
-  React.useEffect(() => {
+  useEffect(() => () => {
+    if (emailNoticeTimeoutRef.current) {
+      window.clearTimeout(emailNoticeTimeoutRef.current)
+    }
+    if (noticeTimeoutRef.current) {
+      window.clearTimeout(noticeTimeoutRef.current)
+    }
+  }, [])
+
+  useEffect(() => {
     if (typeof window === 'undefined') return
     const state = extractStateFromHash(window.location.hash)
     if (!state) return
 
     setProvince(state.province)
+    let strippedPremium = false
     setItems(
       state.items.length
         ? state.items.map((item, index) =>
             createLineItem(index + 1, {
               label: item.label,
-              category: validateCategory(item.category),
+              category: (() => {
+                const normalised = validateCategory(item.category)
+                if (isPremiumCategory(normalised)) {
+                  strippedPremium = true
+                  return 'Standard'
+                }
+                return normalised
+              })(),
               amount: item.amount,
             })
           )
         : [createLineItem(1)],
     )
-  }, [])
+
+    if (strippedPremium) {
+      showNotice('Premium items are coming soon. We kept your totals using Standard rates for now.')
+    }
+  }, [showNotice])
 
   return (
     <div className="calculator-shell">
@@ -305,11 +350,15 @@ export default function TaxSmartCalculator() {
                   value={item.category}
                   onChange={(event) => handleUpdateItem(item.id, { category: event.target.value as Category })}
                 >
-                  {CATEGORY_OPTIONS.map((option) => (
-                    <option key={option} value={option}>
-                      {option}
-                    </option>
-                  ))}
+                  {CATEGORY_OPTIONS.map((option) => {
+                    const premium = isPremiumCategory(option)
+                    return (
+                      <option key={option} value={option} disabled={premium}>
+                        {option}
+                        {premium ? ' (Coming soon)' : ''}
+                      </option>
+                    )
+                  })}
                 </select>
                 <label className="sr-only" htmlFor={`amount-${item.id}`}>
                   Item amount
@@ -465,8 +514,8 @@ export default function TaxSmartCalculator() {
               </a>
             </li>
             <li>
-              <a href="https://www2.gov.bc.ca/gov/content/taxes/sales-taxes/pst/ice-cream-sweetened-beverages" target="_blank" rel="noreferrer">
-                BC PST: Sweetened carbonated beverages
+              <a href="https://www.canada.ca/en/revenue-agency/services/forms-publications/publications/rc4022.html" target="_blank" rel="noreferrer">
+                CRA RC4022: GST/HST supplies (taxable, zero-rated, and exempt)
               </a>
             </li>
             <li>
@@ -496,6 +545,9 @@ export default function TaxSmartCalculator() {
             <button type="button" className="btn ghost btn-copy-email" onClick={handleCopyEmail}>
               Copy
             </button>
+            {emailNotice && (
+              <span className="email-notice" role="status">{emailNotice}</span>
+            )}
           </div>
           <a
             className="btn primary feedback-sponsor"
@@ -505,11 +557,6 @@ export default function TaxSmartCalculator() {
           >
             Support us on GitHub Sponsors
           </a>
-          <iframe
-            className="sponsor-iframe"
-            {...SPONSOR_IFRAME_PROPS}
-            style={{ border: 0, borderRadius: '6px' }}
-          />
         </section>
       </main>
 
@@ -523,11 +570,6 @@ export default function TaxSmartCalculator() {
         >
           Sponsor us on GitHub
         </a>
-        <iframe
-          className="sponsor-iframe"
-          {...SPONSOR_IFRAME_PROPS}
-          style={{ border: 0, borderRadius: '6px' }}
-        />
       </footer>
     </div>
   )

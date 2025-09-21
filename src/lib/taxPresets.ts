@@ -1,4 +1,4 @@
-import { Category, CATEGORY_OPTIONS } from './taxData';
+import { Category } from './taxData';
 
 export interface TaxPreset {
   id: string;
@@ -9,20 +9,6 @@ export interface TaxPreset {
   icon?: string;
 }
 
-// Map of preset IDs to their corresponding categories
-const PRESET_CATEGORY_MAP: Record<string, Category> = {
-  'basic-groceries': 'Zero-rated (basic groceries)',
-  'restaurant': 'Prepared food / restaurant',
-  'alcohol': 'Tobacco / alcohol',
-  'clothing': 'Standard',
-  'children-clothing': "Children's clothing & footwear",
-  'books': 'Printed books (qualifying)',
-  'electronics': 'Standard',
-  'transportation': 'Public transit fares',
-  'health': 'Prescription drugs / medical',
-  'education': 'Standard'
-};
-
 export const TAX_PRESETS: TaxPreset[] = [
   {
     id: 'basic-groceries',
@@ -31,22 +17,6 @@ export const TAX_PRESETS: TaxPreset[] = [
     category: 'Zero-rated (basic groceries)',
     isExempt: true,
     icon: '🍎',
-  },
-  {
-    id: 'restaurant',
-    label: 'Restaurant Meals',
-    description: 'Meals from restaurants and fast food',
-    category: 'Prepared food / restaurant',
-    isExempt: false,
-    icon: '🍽️',
-  },
-  {
-    id: 'alcohol',
-    label: 'Alcoholic Beverages',
-    description: 'Beer, wine, and spirits',
-    category: 'Tobacco / alcohol',
-    isExempt: false,
-    icon: '🍷',
   },
   {
     id: 'clothing',
