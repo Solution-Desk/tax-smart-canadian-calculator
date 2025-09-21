@@ -32,7 +32,6 @@ const PERCENT_FORMATTER = new Intl.NumberFormat('en-CA', {
   maximumFractionDigits: 2,
 })
 const CONTACT_EMAIL = 'taxapp@thesolutiondesk.ca'
-const SPONSOR_URL = 'https://github.com/Solution-Desk?tab=sponsors'
 
 const COMING_SOON_FEATURES = [
   {
@@ -588,14 +587,15 @@ export default function TaxSmartCalculator() {
 
       <footer className="calculator-footer">
         <span>Built for Canadians. Totally free. No ads.</span>
-        <a
-          className="btn ghost footer-sponsor"
-          href={SPONSOR_URL}
-          target="_blank"
-          rel="noreferrer"
-        >
-          Sponsor us on GitHub
-        </a>
+        <div className="sponsor-embed" aria-hidden="true">
+          <iframe
+            src="https://github.com/sponsors/SolutionsRMe/button"
+            title="Sponsor SolutionsRMe"
+            height="32"
+            width="114"
+            style={{ border: 0, borderRadius: '6px' }}
+          />
+        </div>
       </footer>
     </div>
   )
