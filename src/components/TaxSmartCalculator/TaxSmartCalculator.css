@@ -434,9 +434,14 @@
 
 .line-item {
   display: grid;
-  grid-template-columns: minmax(0, 2fr) minmax(0, 2fr) minmax(0, 1.2fr) auto;
+  grid-template-columns: 2fr 2fr 1.5fr auto;
   gap: 12px;
+  margin-bottom: 12px;
   align-items: center;
+  position: relative;
+}
+
+.line-item {
   padding: 16px;
   border-radius: 16px;
   border: 1px solid var(--border);
@@ -620,21 +625,27 @@
   color: var(--text-primary);
   padding: 0 14px;
   font-size: 15px;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
 }
 
 .input:focus,
 .amount-field .input:focus {
   outline: none;
-  box-shadow: 0 0 0 3px var(--ring);
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px var(--ring);
 }
 
 /* Select input styles */
 select.input,
 .preset-select {
-  -webkit-appearance: none;
-  -moz-appearance: none;
-  appearance: none;
-  background: var(--surface-raised) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 8'%3E%3Cpath fill='%23c7d2fe' d='M1.41 0L6 4.59 10.59 0 12 1.41 6 7.41 0 1.41z'/%3E%3C/svg%3E") no-repeat calc(100% - 16px) center / 12px;
+  background: var(--surface-raised);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 8'%3E%3Cpath fill='%236b7280' d='M1.41 0L6 4.58 10.59 0 12 1.41 6 7.41 0 1.41z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 1rem center;
+  background-size: 12px 8px;
   border: 1px solid var(--border);
   color: var(--text-primary);
   cursor: pointer;
@@ -643,20 +654,39 @@ select.input,
   border-radius: 12px;
   height: 44px;
   width: 100%;
-  transition: border-color 0.2s ease, background 0.2s ease;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
   text-overflow: ellipsis;
-  /* Ensure the background doesn't repeat */
-  background-repeat: no-repeat !important;
-  /* Hide default arrow in IE10+ */
-  &::-ms-expand {
-    display: none;
-  }
-  /* Firefox specific fixes */
-  @-moz-document url-prefix() {
+  position: relative;
+  z-index: 1;
+}
+
+/* Hide default arrows */
+select.input::-ms-expand,
+.preset-select::-ms-expand,
+select.input::-webkit-inner-spin-button,
+select.input::-webkit-outer-spin-button,
+select.input::-webkit-clear-button {
+  display: none;
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Firefox specific fixes */
+@-moz-document url-prefix() {
+  select.input,
+  .preset-select {
     text-indent: 0.01px;
     text-overflow: '';
     padding-right: 2.5rem;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 8'%3E%3Cpath fill='%236b7280' d='M1.41 0L6 4.58 10.59 0 12 1.41 6 7.41 0 1.41z'/%3E%3C/svg%3E") !important;
   }
+}
+
+/* Ensure select elements have the same appearance as other inputs */
+select.input:focus,
+.preset-select:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px var(--ring);
 }
 
 .preset-select::-ms-expand {

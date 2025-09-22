@@ -15,8 +15,9 @@ import { encodeState, extractStateFromHash } from "../../lib/share"
 import { useDarkMode } from "../../hooks/useDarkMode"
 import { useLocalStorage } from "../../hooks/useAutoCalc"
 import { TAX_PRESETS } from "../../lib/taxPresets"
-import { Sparkles } from 'lucide-react'
+import { Sparkles, Info } from 'lucide-react'
 import { Modal } from '../Modal'
+import { CategoryTooltip } from '../ui/Tooltip'
 import "./TaxSmartCalculator.css"
 
 type LineItemForm = {
@@ -449,22 +450,27 @@ export default function TaxSmartCalculator() {
                 <label className="sr-only" htmlFor={`category-${item.id}`}>
                   Item category
                 </label>
-                <select
-                  id={`category-${item.id}`}
-                  className="input"
-                  value={item.category}
-                  onChange={(event) => handleUpdateItem(item.id, { category: event.target.value as Category })}
-                >
-                  {CATEGORY_OPTIONS.map((option) => {
-                    const premium = isPremiumCategory(option)
-                    return (
-                      <option key={option} value={option} disabled={premium}>
-                        {option}
-                        {premium ? ' (Coming soon)' : ''}
-                      </option>
-                    )
-                  })}
-                </select>
+                <div className="relative w-full">
+                  <select
+                    id={`category-${item.id}`}
+                    className="input w-full pr-8"
+                    value={item.category}
+                    onChange={(event) => handleUpdateItem(item.id, { category: event.target.value as Category })}
+                  >
+                    {CATEGORY_OPTIONS.map((option) => {
+                      const premium = isPremiumCategory(option)
+                      return (
+                        <option key={option} value={option} disabled={premium}>
+                          {option}
+                          {premium ? ' (Coming soon)' : ''}
+                        </option>
+                      )
+                    })}
+                  </select>
+                  <div className="absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none">
+                    <CategoryTooltip category={item.category} province={province} />
+                  </div>
+                </div>
                 <label className="sr-only" htmlFor={`amount-${item.id}`}>
                   Item amount
                 </label>
