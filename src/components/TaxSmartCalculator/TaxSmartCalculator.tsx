@@ -209,9 +209,8 @@ export default function TaxSmartCalculator() {
   const [emailNotice, setEmailNotice] = useState<string | null>(null)
   const [isPremiumModalOpen, setPremiumModalOpen] = useState(false)
   const [isReferencesModalOpen, setReferencesModalOpen] = useState(false)
-  const [isTaxInfoModalOpen, setTaxInfoModalOpen] = useState(false)
-  const emailNoticeTimeoutRef = useRef<number>()
-  const noticeTimeoutRef = useRef<number>()
+  const emailNoticeTimeoutRef = useRef<NodeJS.Timeout>()
+  const noticeTimeoutRef = useRef<NodeJS.Timeout>()
 
   const numericItems = useMemo<LineItemInput[]>(
     () => items.map((item) => ({ amount: parseAmount(item.amount), category: item.category })),
@@ -359,94 +358,58 @@ export default function TaxSmartCalculator() {
 
   return (
     <div className="calculator-shell">
+      <div className="dev-notice">
+        <div className="dev-notice-content">
+          <span className="dev-notice-icon">🔍</span>
+          <span>This calculator is under active development. If you notice any inaccuracies, we'd greatly appreciate your feedback!</span>
+        </div>
+      </div>
       <header className="calculator-header">
-        <div className="header-content">
-          <div className="calculator-brand">
-            <span className="calculator-logo" aria-hidden>CA</span>
-            <div>
-              <p className="brand-name">TaxSmart</p>
-              <p className="brand-tagline">GST / HST / PST & QST in one view</p>
-            </div>
+        <div className="calculator-brand">
+          <span className="calculator-logo" aria-hidden>CA</span>
+          <div>
+            <p className="brand-name">TaxSmart</p>
+            <p className="brand-tagline">GST / HST / PST & QST in one view</p>
           </div>
-          
-          <div className="header-actions">
-            <button
-              type="button"
-              className="btn primary"
-              onClick={() => setTaxInfoModalOpen(true)}
-              aria-haspopup="dialog"
-              aria-expanded={isTaxInfoModalOpen}
-            >
-              <Info className="h-4 w-4 mr-1.5" />
-              Tax Categories
-            </button>
-            
-            <div className="header-buttons">
-              <button
-                type="button"
-                className="btn ghost"
-                onClick={() => setReferencesModalOpen(true)}
-                aria-haspopup="dialog"
-                aria-expanded={isReferencesModalOpen}
-              >
-                References
-              </button>
-              
-              <button 
-                type="button" 
-                className="btn ghost"
-                onClick={() => setPremiumModalOpen(true)}
-                aria-haspopup="dialog"
-                aria-expanded={isPremiumModalOpen}
-              >
-                <Sparkles className="h-3.5 w-3.5 mr-1.5" />
-                Premium
-              </button>
-              
-              <button 
-                type="button" 
-                className="btn ghost"
-                onClick={toggleTheme}
-                aria-label={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
-              >
-                {theme === 'dark' ? '☀️' : '🌙'}
-              </button>
-            </div>
-            
-            <div className="sponsor-embed sponsor-embed--header">
-              <iframe
-                src="https://github.com/sponsors/SolutionsRMe/button"
-                title="Sponsor SolutionsRMe"
-                height="32"
-                width="114"
-                style={{ border: 0, borderRadius: '6px' }}
-              />
-            </div>
+        </div>
+        <div className="header-actions">
+          <div className="sponsor-embed sponsor-embed--header">
+            <iframe
+              src="https://github.com/sponsors/SolutionsRMe/button"
+              title="Sponsor SolutionsRMe"
+              height="32"
+              width="114"
+              style={{ border: 0, borderRadius: '6px' }}
+            />
           </div>
+          <button
+            type="button"
+            className="badge-button"
+            onClick={() => setPremiumModalOpen(true)}
+            aria-haspopup="dialog"
+            aria-expanded={isPremiumModalOpen}
+          >
+            <Sparkles className="h-3.5 w-3.5" aria-hidden />
+            <span>Premium coming soon</span>
+          </button>
+          <button
+            type="button"
+            className="btn ghost header-reference-btn"
+            onClick={() => setReferencesModalOpen(true)}
+            aria-haspopup="dialog"
+            aria-expanded={isReferencesModalOpen}
+          >
+            References
+          </button>
+          <button 
+            type="button" 
+            className="btn whitespace-nowrap" 
+            onClick={toggleTheme}
+          >
+            {theme === 'dark' ? 'Light mode' : 'Dark mode'}
+          </button>
         </div>
       </header>
-
-      <Modal
-        isOpen={isTaxInfoModalOpen}
-        onClose={() => setTaxInfoModalOpen(false)}
-        title="Tax Categories & Rates"
-      >
-        <div className="tax-categories">
-          {getCategoryInfo(province).map(({ category, description, taxRates, examples }) => (
-            <div key={category} className="tax-category">
-              <div className="tax-category-header">
-                <h3 className="tax-category-name">{category}</h3>
-                <span className="tax-rate-badge">{taxRates}</span>
-              </div>
-              <p className="tax-category-desc">{description}</p>
-              <div className="tax-category-examples">
-                <span className="examples-label">Examples: </span>
-                <span className="examples">{examples.join(', ')}</span>
-              </div>
-            </div>
-          ))}
-        </div>
-      </Modal>
 
       <Modal
         isOpen={isPremiumModalOpen}
