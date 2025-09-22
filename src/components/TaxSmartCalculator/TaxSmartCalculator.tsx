@@ -296,6 +296,15 @@ export default function TaxSmartCalculator() {
           >
             References
           </button>
+          <div className="sponsor-embed sponsor-embed--header">
+            <iframe
+              src="https://github.com/sponsors/SolutionsRMe/button"
+              title="Sponsor SolutionsRMe"
+              height="32"
+              width="114"
+              style={{ border: 0, borderRadius: '6px' }}
+            />
+          </div>
           <button type="button" className="btn whitespace-nowrap" onClick={toggleTheme}>
             {theme === 'dark' ? 'Light mode' : 'Dark mode'}
           </button>
@@ -587,7 +596,7 @@ export default function TaxSmartCalculator() {
 
       <footer className="calculator-footer">
         <span>Built for Canadians. Totally free. No ads.</span>
-        <div className="sponsor-embed" aria-hidden="true">
+        <div className="sponsor-embed sponsor-embed--footer" aria-hidden="true">
           <iframe
             src="https://github.com/sponsors/SolutionsRMe/button"
             title="Sponsor SolutionsRMe"
