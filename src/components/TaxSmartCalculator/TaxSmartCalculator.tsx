@@ -277,6 +277,15 @@ export default function TaxSmartCalculator() {
           </div>
         </div>
         <div className="header-actions">
+          <div className="sponsor-embed sponsor-embed--header">
+            <iframe
+              src="https://github.com/sponsors/SolutionsRMe/button"
+              title="Sponsor SolutionsRMe"
+              height="32"
+              width="114"
+              style={{ border: 0, borderRadius: '6px' }}
+            />
+          </div>
           <button
             type="button"
             className="badge-button"
@@ -296,15 +305,6 @@ export default function TaxSmartCalculator() {
           >
             References
           </button>
-          <div className="sponsor-embed sponsor-embed--header">
-            <iframe
-              src="https://github.com/sponsors/SolutionsRMe/button"
-              title="Sponsor SolutionsRMe"
-              height="32"
-              width="114"
-              style={{ border: 0, borderRadius: '6px' }}
-            />
-          </div>
           <button type="button" className="btn whitespace-nowrap" onClick={toggleTheme}>
             {theme === 'dark' ? 'Light mode' : 'Dark mode'}
           </button>
@@ -431,7 +431,7 @@ export default function TaxSmartCalculator() {
 
         <section className="panel">
           <div className="panel-header">
-            <h2 className="panel-title">Line items</h2>
+            <h2 className="panel-title">Items</h2>
           </div>
           <div className="line-items">
             {items.map((item) => (
@@ -519,7 +519,6 @@ export default function TaxSmartCalculator() {
                   ))}
                 </optgroup>
               </select>
-              <span className="dropdown-arrow">▼</span>
             </div>
             <button type="button" className="btn primary" onClick={handleCalculate}>
               Calculate tax

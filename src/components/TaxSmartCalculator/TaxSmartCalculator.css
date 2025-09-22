@@ -213,7 +213,7 @@
 .line-items-actions {
   margin-top: 18px;
   display: flex;
-  align-items: center;
+  align-items: stretch;
   gap: 10px;
   flex-wrap: wrap;
 }
@@ -289,6 +289,7 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  padding: 0 18px;
 }
 
 .contact-email-group {
@@ -565,14 +566,27 @@ select.input:focus,
 }
 
 select.input {
+  -webkit-appearance: none;
+  -moz-appearance: none;
   appearance: none;
-  background: var(--input-bg);
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 8'%3E%3Cpath fill='currentColor' d='M1.41 0L6 4.59 10.59 0 12 1.41 6 7.41 0 1.41z'/%3E%3C/svg%3E");
-  background-repeat: no-repeat;
-  background-position: right 16px center;
-  background-size: 12px;
-  padding-right: 44px;
+  background: var(--surface-raised);
+  border: 1px solid var(--border);
+  color: var(--text-primary);
   cursor: pointer;
+  font-size: 0.95rem;
+  padding: 0 2.5rem 0 1rem;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 8'%3E%3Cpath fill='%23c7d2fe' d='M1.41 0L6 4.59 10.59 0 12 1.41 6 7.41 0 1.41z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: calc(100% - 16px) center;
+  background-size: 12px;
+  padding-right: 2.75rem;
+  transition: border-color 0.2s ease, background 0.2s ease;
+}
+
+select.input:focus-visible {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.35);
 }
 
 select.input option {
@@ -580,24 +594,12 @@ select.input option {
   color: var(--text-primary);
 }
 
-/* Fix dropdown options visibility in dark mode */
-select.input option:checked {
-  background: var(--accent);
-  color: #fff;
+select.input option:disabled {
+  color: var(--text-muted);
 }
 
-/* Ensure dropdown options are visible in all browsers */
-select.input {
-  color: var(--text-primary);
-}
-
-select.input option {
-  background: var(--surface) !important;
-  color: var(--text-primary) !important;
-}
-
-select.input option[disabled] {
-  color: var(--text-muted) !important;
+select.input::-ms-expand {
+  display: none;
 }
 
 .sr-only {
@@ -691,6 +693,7 @@ select.input option[disabled] {
 
 .sponsor-embed {
   display: inline-flex;
+  align-items: center;
 }
 
 .sponsor-embed iframe {
@@ -698,10 +701,15 @@ select.input option[disabled] {
 }
 
 .sponsor-embed--header {
-  margin-left: auto;
+  margin-right: 8px;
+}
+
+.header-actions {
+  gap: 10px;
 }
 
 .sponsor-embed--footer {
+  display: flex;
   justify-content: center;
   width: 100%;
 }
