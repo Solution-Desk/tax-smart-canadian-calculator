@@ -209,8 +209,9 @@ export default function TaxSmartCalculator() {
   const [emailNotice, setEmailNotice] = useState<string | null>(null)
   const [isPremiumModalOpen, setPremiumModalOpen] = useState(false)
   const [isReferencesModalOpen, setReferencesModalOpen] = useState(false)
-  const emailNoticeTimeoutRef = useRef<NodeJS.Timeout>()
-  const noticeTimeoutRef = useRef<NodeJS.Timeout>()
+  const [isTaxInfoModalOpen, setTaxInfoModalOpen] = useState(false)
+  const emailNoticeTimeoutRef = useRef<ReturnType<typeof setTimeout>>()
+  const noticeTimeoutRef = useRef<ReturnType<typeof setTimeout>>()
 
   const numericItems = useMemo<LineItemInput[]>(
     () => items.map((item) => ({ amount: parseAmount(item.amount), category: item.category })),
@@ -482,6 +483,28 @@ export default function TaxSmartCalculator() {
         </ul>
       </Modal>
 
+      <Modal
+        isOpen={isTaxInfoModalOpen}
+        onClose={() => setTaxInfoModalOpen(false)}
+        title="Tax Categories & Rates"
+      >
+        <div className="tax-categories">
+          {getCategoryInfo(province).map(({ category, description, taxRates, examples }) => (
+            <div key={category} className="tax-category">
+              <div className="tax-category-header">
+                <h3 className="tax-category-name">{category}</h3>
+                <span className="tax-rate-badge">{taxRates}</span>
+              </div>
+              <p className="tax-category-desc">{description}</p>
+              <div className="tax-category-examples">
+                <span className="examples-label">Examples: </span>
+                <span className="examples">{examples.join(', ')}</span>
+              </div>
+            </div>
+          ))}
+        </div>
+      </Modal>
+
       {notice && (
         <div role="status" aria-live="polite" className="calculator-notice">
           {notice}
@@ -549,10 +572,10 @@ export default function TaxSmartCalculator() {
                 <label className="sr-only" htmlFor={`category-${item.id}`}>
                   Item category
                 </label>
-                <div className="relative w-full">
+                <div className="flex gap-2 w-full">
                   <select
                     id={`category-${item.id}`}
-                    className="input w-full pr-8"
+                    className="input flex-1"
                     value={item.category}
                     onChange={(event) => handleUpdateItem(item.id, { category: event.target.value as Category })}
                   >
@@ -566,9 +589,14 @@ export default function TaxSmartCalculator() {
                       )
                     })}
                   </select>
-                  <div className="absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none">
-                    <CategoryTooltip category={item.category} province={province} />
-                  </div>
+                  <button
+                    type="button"
+                    className="btn ghost p-2"
+                    onClick={() => setTaxInfoModalOpen(true)}
+                    aria-label="View category information"
+                  >
+                    <Info className="h-4 w-4" />
+                  </button>
                 </div>
                 <label className="sr-only" htmlFor={`amount-${item.id}`}>
                   Item amount
