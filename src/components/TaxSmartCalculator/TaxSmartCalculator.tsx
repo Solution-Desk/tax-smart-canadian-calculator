@@ -557,7 +557,7 @@ export default function TaxSmartCalculator() {
             <h2 className="panel-title">Items</h2>
           </div>
           <div className="line-items">
-            {items.map((item) => (
+            {items.map((item, index) => (
               <div key={item.id} className="line-item">
                 <label className="sr-only" htmlFor={`label-${item.id}`}>
                   Item label
@@ -630,15 +630,16 @@ export default function TaxSmartCalculator() {
                     aria-label="Item amount"
                   />
                 </div>
-                <button
-                  type="button"
-                  className="btn icon"
-                  aria-label="Remove line item"
-                  onClick={() => handleRemoveItem(item.id)}
-                  disabled={items.length === 1}
-                >
-                  ×
-                </button>
+                {index > 0 && (
+                  <button
+                    type="button"
+                    className="delete-button"
+                    onClick={() => handleRemoveItem(item.id)}
+                    aria-label="Remove item"
+                  >
+                    <X className="h-4 w-4" />
+                  </button>
+                )}
               </div>
             ))}
           </div>
