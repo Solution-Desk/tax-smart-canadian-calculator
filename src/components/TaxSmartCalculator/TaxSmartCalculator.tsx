@@ -572,10 +572,10 @@ export default function TaxSmartCalculator() {
                 <label className="sr-only" htmlFor={`category-${item.id}`}>
                   Item category
                 </label>
-                <div className="flex gap-2 w-full">
+                <div className="relative w-full">
                   <select
                     id={`category-${item.id}`}
-                    className="input flex-1"
+                    className="input w-full pr-10"
                     value={item.category}
                     onChange={(event) => handleUpdateItem(item.id, { category: event.target.value as Category })}
                   >
@@ -591,8 +591,11 @@ export default function TaxSmartCalculator() {
                   </select>
                   <button
                     type="button"
-                    className="btn ghost p-2"
-                    onClick={() => setTaxInfoModalOpen(true)}
+                    className="absolute right-8 top-1/2 -translate-y-1/2 p-1 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setTaxInfoModalOpen(true);
+                    }}
                     aria-label="View category information"
                   >
                     <Info className="h-4 w-4" />
