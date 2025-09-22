@@ -20,6 +20,95 @@ import { Modal } from '../Modal'
 import { CategoryTooltip } from '../ui/Tooltip'
 import "./TaxSmartCalculator.css"
 
+type TaxCategoryInfo = {
+  category: string;
+  description: string;
+  taxRates: string;
+  examples: string[];
+};
+
+const getCategoryInfo = (province: string): TaxCategoryInfo[] => [
+  {
+    category: 'Standard',
+    description: 'Most goods and services',
+    taxRates: getStandardTaxRate(province),
+    examples: ['Electronics', 'Furniture', 'Clothing (adult)']
+  },
+  {
+    category: 'Zero-rated (basic groceries)',
+    description: 'Most food and beverages for home consumption',
+    taxRates: getGroceryTaxRate(province),
+    examples: ['Milk', 'Bread', 'Fruits & Vegetables']
+  },
+  {
+    category: 'Prepared food / restaurant',
+    description: 'Food and beverages prepared by a restaurant or similar',
+    taxRates: getStandardTaxRate(province),
+    examples: ['Restaurant meals', 'Takeout', 'Food court items']
+  },
+  {
+    category: 'Children\'s clothing & footwear',
+    description: 'Clothing and footwear for children under a certain age',
+    taxRates: getChildrensClothingTaxRate(province),
+    examples: ['Kids\' shirts', 'Children\'s shoes']
+  },
+  {
+    category: 'Exempt',
+    description: 'Items exempt from all sales taxes',
+    taxRates: '0%',
+    examples: ['Prescription drugs', 'Basic groceries in most provinces']
+  },
+  {
+    category: 'Feminine hygiene products',
+    description: 'Menstrual products and similar items',
+    taxRates: '0%',
+    examples: ['Tampons', 'Pads', 'Menstrual cups']
+  },
+  {
+    category: 'Public transit fares',
+    description: 'Public transportation tickets and passes',
+    taxRates: '0%',
+    examples: ['Bus tickets', 'Subway passes']
+  },
+  {
+    category: 'Printed books (qualifying)',
+    description: 'Physical books',
+    taxRates: getBookTaxRate(province),
+    examples: ['Novels', 'Textbooks', 'Non-fiction']
+  }
+];
+
+function getStandardTaxRate(province: string): string {
+  const rates = TAX_RATES[province as Province];
+  if (rates.kind === 'HST') return `${(rates.hst || 0) * 100}% HST`;
+  if (rates.kind === 'GST_PST') return `${rates.gst * 100}% GST + ${rates.pst}% PST`;
+  if (rates.kind === 'GST_QST') return `${rates.gst * 100}% GST + ${rates.qst}% QST`;
+  return `${rates.gst * 100}% GST`;
+}
+
+function getGroceryTaxRate(province: string): string {
+  const rates = TAX_RATES[province as Province];
+  if (['SK', 'MB', 'QC'].includes(province)) {
+    const pst = province === 'QC' ? rates.qst : rates.pst;
+    const label = province === 'QC' ? 'QST' : 'PST';
+    return `0% GST + ${pst}% ${label}`;
+  }
+  return '0% GST';
+}
+
+function getChildrensClothingTaxRate(province: string): string {
+  if (['ON', 'NS', 'PE', 'BC'].includes(province)) return '0%';
+  if (province === 'MB') return '0% (up to $150)';
+  return getStandardTaxRate(province);
+}
+
+function getBookTaxRate(province: string): string {
+  if (['ON', 'NS', 'NB', 'NL', 'PE', 'BC', 'MB', 'SK', 'QC'].includes(province)) {
+    return '0%';
+  }
+  return getStandardTaxRate(province);
+}
+
 type LineItemForm = {
   id: string
   label: string
@@ -72,14 +161,14 @@ function createLineItem(index: number, overrides: Partial<LineItemForm> = {}): L
     id: crypto.randomUUID(),
     label: overrides.label ?? `Item ${index}`,
     category: overrides.category ?? 'Standard',
-    amount: overrides.amount ?? '0',
+    amount: overrides.amount ?? '',
   }
 }
 
-function parseAmount(value: string): number {
-  if (!value) return 0
-  const numeric = Number.parseFloat(value)
-  return Number.isFinite(numeric) && numeric > 0 ? numeric : 0
+function parseAmount(amount: string): number {
+  if (!amount.trim()) return 0;
+  const parsed = parseFloat(amount.replace(/[^0-9.]/g, ''));
+  return isNaN(parsed) ? 0 : parsed;
 }
 
 function formatCurrency(value: number) {
@@ -120,6 +209,7 @@ export default function TaxSmartCalculator() {
   const [emailNotice, setEmailNotice] = useState<string | null>(null)
   const [isPremiumModalOpen, setPremiumModalOpen] = useState(false)
   const [isReferencesModalOpen, setReferencesModalOpen] = useState(false)
+  const [isTaxInfoModalOpen, setTaxInfoModalOpen] = useState(false)
   const emailNoticeTimeoutRef = useRef<ReturnType<typeof window.setTimeout>>()
   const noticeTimeoutRef = useRef<ReturnType<typeof window.setTimeout>>()
 
@@ -309,6 +399,13 @@ export default function TaxSmartCalculator() {
           <button type="button" className="btn whitespace-nowrap" onClick={toggleTheme}>
             {theme === 'dark' ? 'Light mode' : 'Dark mode'}
           </button>
+          <button 
+            type="button" 
+            className="btn ghost"
+            onClick={() => setTaxInfoModalOpen(true)}
+          >
+            Tax Categories
+          </button>
         </div>
       </header>
 
@@ -480,12 +577,24 @@ export default function TaxSmartCalculator() {
                     id={`amount-${item.id}`}
                     className="input"
                     value={item.amount}
-                    onChange={(event) => handleUpdateItem(item.id, { amount: event.target.value })}
-                    inputMode="decimal"
-                    type="number"
-                    step="0.01"
-                    min="0"
+                    onChange={(event) => {
+                      // Only allow numbers and decimal points
+                      const value = event.target.value.replace(/[^0-9.]/g, '');
+                      handleUpdateItem(item.id, { amount: value });
+                    }}
+                    onBlur={(event) => {
+                      // Format the number with 2 decimal places when input loses focus
+                      if (event.target.value) {
+                        const num = parseFloat(event.target.value);
+                        if (!isNaN(num)) {
+                          handleUpdateItem(item.id, { amount: num.toFixed(2).replace(/\.?0+$/, '') });
+                        }
+                      }
+                    }}
                     placeholder="0.00"
+                    type="text"
+                    inputMode="decimal"
+                    aria-label="Item amount"
                   />
                 </div>
                 <button
