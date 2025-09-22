@@ -35,28 +35,28 @@ const CONTACT_EMAIL = 'taxapp@thesolutiondesk.ca'
 
 const COMING_SOON_FEATURES = [
   {
-    title: 'Saved presets & projects',
-    description: 'Store favourite configurations so repeat calculations take seconds, not minutes.',
+    title: 'Shopping List Mode',
+    description: 'Save and organize your shopping items with automatic tax calculations.',
   },
   {
-    title: 'Unlimited line items',
-    description: 'Remove the cap for complex invoices and detailed cost breakdowns.',
+    title: 'Receipt Scanner',
+    description: 'Snap a photo of your receipt to analyze and understand the taxes you paid.',
   },
   {
-    title: 'CSV & PDF export',
-    description: 'Send polished summaries to clients or plug totals into your billing tools.',
+    title: 'Budget Planning',
+    description: 'Set spending limits and see how taxes impact your total budget.',
   },
   {
-    title: 'Batch import (CSV)',
-    description: 'Upload spreadsheet estimates and calculate tax on every row automatically.',
+    title: 'Price Comparison',
+    description: 'Compare total costs including taxes across different stores and provinces.',
   },
   {
-    title: 'Private share links (30 days)',
-    description: 'Lock down sensitive details with expiring, access-controlled links.',
+    title: 'Tax Breakdown',
+    description: 'Detailed breakdown of each tax component on your purchases.',
   },
   {
-    title: 'Priority support & early previews',
-    description: 'Get front-of-queue help plus sneak peeks at new automation upgrades.',
+    title: 'Savings Calculator',
+    description: 'See how much you could save by shopping in different provinces or during tax-free events.',
   },
 ];
 
@@ -314,11 +314,11 @@ export default function TaxSmartCalculator() {
       <Modal
         isOpen={isPremiumModalOpen}
         onClose={() => setPremiumModalOpen(false)}
-        title="Premium features coming soon"
+        title="New Features Coming Soon"
       >
         <p className="modal-lead">
-          Premium unlocks planning tools for non-essential purchases – restaurant meals, alcohol,
-          recreational cannabis, and more. We’re polishing the experience before launch.
+          Get ready for powerful tools to help you understand and plan for taxes on your everyday purchases.
+          We're adding features to make shopping and budgeting easier than ever before.
         </p>
         <ul className="modal-feature-list">
           {COMING_SOON_FEATURES.map((feature) => (
@@ -329,8 +329,8 @@ export default function TaxSmartCalculator() {
           ))}
         </ul>
         <p className="modal-footnote">
-          Premium categories waiting in the wings: prepared food, snack foods, sweetened beverages,
-          recreational cannabis, and alcohol.
+          Upcoming features will help you understand taxes on all your purchases, from groceries to electronics,
+          so you can shop with confidence.
         </p>
       </Modal>
 

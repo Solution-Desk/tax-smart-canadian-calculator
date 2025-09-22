@@ -629,6 +629,7 @@
 }
 
 /* Select input styles */
+select.input,
 .preset-select {
   -webkit-appearance: none;
   -moz-appearance: none;
@@ -644,6 +645,18 @@
   width: 100%;
   transition: border-color 0.2s ease, background 0.2s ease;
   text-overflow: ellipsis;
+  /* Ensure the background doesn't repeat */
+  background-repeat: no-repeat !important;
+  /* Hide default arrow in IE10+ */
+  &::-ms-expand {
+    display: none;
+  }
+  /* Firefox specific fixes */
+  @-moz-document url-prefix() {
+    text-indent: 0.01px;
+    text-overflow: '';
+    padding-right: 2.5rem;
+  }
 }
 
 .preset-select::-ms-expand {
