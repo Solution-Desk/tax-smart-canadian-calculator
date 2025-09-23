@@ -15,7 +15,7 @@ import { encodeState, extractStateFromHash } from "../../lib/share"
 import { useDarkMode } from "../../hooks/useDarkMode"
 import { useLocalStorage } from "../../hooks/useAutoCalc"
 import { TAX_PRESETS } from "../../lib/taxPresets"
-import { Sparkles, Info } from 'lucide-react'
+import { Sparkles, Info, X } from 'lucide-react'
 import { Modal } from '../Modal'
 import { CategoryTooltip } from '../ui/Tooltip'
 import "./TaxSmartCalculator.css"
@@ -156,9 +156,20 @@ function isPremiumCategory(category: Category) {
   return PREMIUM_CATEGORY_SET.has(category);
 }
 
+function generateId(): string {
+  try {
+    // Use the most robust API when available
+    if (typeof crypto !== 'undefined' && 'randomUUID' in crypto) {
+      return (crypto as Crypto & { randomUUID?: () => string }).randomUUID!();
+    }
+  } catch {}
+  // Fallback: reasonably unique ID
+  return Math.random().toString(36).slice(2) + Date.now().toString(36)
+}
+
 function createLineItem(index: number, overrides: Partial<LineItemForm> = {}): LineItemForm {
   return {
-    id: crypto.randomUUID(),
+    id: generateId(),
     label: overrides.label ?? `Item ${index}`,
     category: overrides.category ?? 'Standard',
     amount: overrides.amount ?? '',

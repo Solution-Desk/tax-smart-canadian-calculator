@@ -22,7 +22,38 @@ export default class ErrorBoundary extends React.Component<Props, State> {
 
   componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
     console.error('ErrorBoundary caught an error:', error, errorInfo);
+    // Log to error tracking service if available
+    if (window.gtag) {
+      window.gtag('event', 'exception', {
+        description: error.toString(),
+        fatal: true,
+      });
+    }
   }
+
+  handleReset = () => {
+    // Clear any service worker caches
+    if ('caches' in window) {
+      caches.keys().then(cacheNames => {
+        cacheNames.forEach(cacheName => {
+          caches.delete(cacheName);
+        });
+      });
+    }
+    // Unregister service workers if present
+    if ('serviceWorker' in navigator) {
+      try {
+        navigator.serviceWorker.getRegistrations().then((registrations) => {
+          registrations.forEach((registration) => registration.unregister());
+        });
+      } catch {}
+    }
+    // Clear local storage if needed
+    // localStorage.clear();
+    
+    // Force reload
+    window.location.reload();
+  };
 
   render() {
     if (this.state.hasError) {
@@ -34,10 +65,21 @@ export default class ErrorBoundary extends React.Component<Props, State> {
         <div className="min-h-screen flex items-center justify-center p-6">
           <div className="max-w-md w-full text-center">
             <h1 className="text-2xl font-bold text-red-500 mb-4">Something went wrong</h1>
-            <div className="bg-gray-100 dark:bg-gray-800 p-4 rounded-lg text-left overflow-auto">
-              <pre className="text-sm">
-                {this.state.error?.message || 'Unknown error occurred'}
-              </pre>
+            <div className="space-y-4">
+              <div className="bg-gray-100 dark:bg-gray-800 p-4 rounded-lg text-left overflow-auto">
+                <pre className="text-sm">
+                  {this.state.error?.message || 'Unknown error occurred'}
+                </pre>
+              </div>
+              <button
+                onClick={this.handleReset}
+                className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition-colors"
+              >
+                Clear Cache & Refresh
+              </button>
+              <p className="text-sm text-gray-500">
+                If the problem persists, please try using a private/incognito window.
+              </p>
               <details className="mt-2 text-xs opacity-75">
                 <summary className="cursor-pointer">View technical details</summary>
                 <pre className="mt-2 p-2 bg-black/5 dark:bg-white/5 rounded overflow-auto max-h-40">

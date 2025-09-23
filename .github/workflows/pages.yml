@@ -37,8 +37,21 @@ jobs:
           mkdir -p dist
           echo "taxapp.thesolutiondesk.ca" > dist/CNAME
           
-      - name: SPA fallback (copy index.html to 404.html)
-        run: cp dist/index.html dist/404.html
+      - name: SPA fallback and cache control
+        run: |
+          # Create 404.html for SPA routing
+          cp dist/index.html dist/404.html
+          
+          # Add _headers file for cache control
+          cat > dist/_headers << 'EOF'
+          /*
+            Cache-Control: no-cache, no-store, must-revalidate
+            X-Frame-Options: DENY
+            X-Content-Type-Options: nosniff
+            Referrer-Policy: strict-origin-when-cross-origin
+            Permissions-Policy: geolocation=(), microphone=(), camera=()
+          */
+          EOF
           
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
