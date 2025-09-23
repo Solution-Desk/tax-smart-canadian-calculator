@@ -1,5 +1,6 @@
 import React from 'react';
 import { VersionBadge } from './VersionBadge';
+import { Link } from 'react-router-dom';
 
 export function Footer() {
   const currentYear = new Date().getFullYear();
@@ -19,6 +20,9 @@ export function Footer() {
           <p className="footer-disclaimer">
             This tool is for informational purposes only and should not be considered tax advice.
             Verify all calculations with official tax authorities.
+          </p>
+          <p className="footer-disclaimer">
+            <Link to="/privacy">Privacy Policy</Link>
           </p>
         </div>
         <div className="footer-version">

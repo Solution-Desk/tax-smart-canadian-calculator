@@ -969,6 +969,16 @@ select.input::-ms-expand {
   .panel {
     padding: 20px;
   }
+
+  /* Sticky totals on mobile */
+  .totals-panel {
+    position: sticky;
+    bottom: 0;
+    z-index: 30;
+    background: var(--surface);
+    border-top: 1px solid var(--border);
+    box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.35);
+  }
 }
 
 
@@ -999,3 +1009,22 @@ select.input::-ms-expand {
   display: none;
 }
 
+
+/* Ads */
+.ad-wrapper {
+  margin-top: 8px;
+  margin-bottom: 12px;
+}
+
+.ad-container {
+  border: 1px dashed var(--border);
+  background: var(--surface-raised);
+  border-radius: 12px;
+  padding: 6px;
+  min-height: 90px; /* fallback space for responsive units */
+  display: block;
+}
+
+.ad-container .adsbygoogle {
+  display: block !important;
+}

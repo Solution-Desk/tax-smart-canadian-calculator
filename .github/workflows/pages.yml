@@ -31,6 +31,9 @@ jobs:
         
       - name: Build
         run: npm run build
+        env:
+          VITE_ADSENSE_CLIENT_ID: ${{ secrets.ADSENSE_CLIENT_ID }}
+          VITE_ADSENSE_SLOT_INLINE: ${{ secrets.ADSENSE_SLOT_INLINE }}
         
       - name: Create CNAME file
         run: |

@@ -19,6 +19,9 @@ import { Sparkles, Info, X } from 'lucide-react'
 import { Modal } from '../Modal'
 import { CategoryTooltip } from '../ui/Tooltip'
 import "./TaxSmartCalculator.css"
+import { AdSlot } from '../ads/AdSlot'
+import { usePremium } from '../../hooks/usePremium'
+import { UpgradePrompt } from '../UpgradePrompt'
 
 type TaxCategoryInfo = {
   category: string;
@@ -80,10 +83,10 @@ const getCategoryInfo = (province: string): TaxCategoryInfo[] => [
 
 function getStandardTaxRate(province: string): string {
   const rates = TAX_RATES[province as Province];
-  if (rates.kind === 'HST') return `${(rates.hst || 0) * 100}% HST`;
-  if (rates.kind === 'GST_PST') return `${rates.gst * 100}% GST + ${rates.pst}% PST`;
-  if (rates.kind === 'GST_QST') return `${rates.gst * 100}% GST + ${rates.qst}% QST`;
-  return `${rates.gst * 100}% GST`;
+  if (rates.kind === 'HST') return `${formatRatePct(rates.hst || 0)} HST`;
+  if (rates.kind === 'GST_PST') return `${formatRatePct(rates.gst)} GST + ${formatRatePct(rates.pst)} PST`;
+  if (rates.kind === 'GST_QST') return `${formatRatePct(rates.gst)} GST + ${formatRatePct(rates.qst)} QST`;
+  return `${formatRatePct(rates.gst)} GST`;
 }
 
 function getGroceryTaxRate(province: string): string {
@@ -91,7 +94,7 @@ function getGroceryTaxRate(province: string): string {
   if (['SK', 'MB', 'QC'].includes(province)) {
     const pst = province === 'QC' ? rates.qst : rates.pst;
     const label = province === 'QC' ? 'QST' : 'PST';
-    return `0% GST + ${pst}% ${label}`;
+    return `0% GST + ${formatRatePct(pst)} ${label}`;
   }
   return '0% GST';
 }
@@ -190,6 +193,14 @@ function formatPercent(value: number) {
   return `${PERCENT_FORMATTER.format(value * 100)}%`
 }
 
+// Consistent percent formatting for category info badges
+function formatRatePct(rateDecimal: number | undefined): string {
+  const val = (rateDecimal ?? 0) * 100
+  const isInt = Math.abs(val - Math.round(val)) < 1e-9
+  const str = isInt ? Math.round(val).toString() : val.toFixed(2)
+  return `${str.replace(/\.0+$/, '')}%`
+}
+
 async function copyToClipboard(value: string) {
   if (typeof navigator !== 'undefined' && navigator.clipboard?.writeText) {
     try {
@@ -214,15 +225,15 @@ function toShareableItems(items: LineItemForm[]) {
 export default function TaxSmartCalculator() {
   const { theme, toggleTheme } = useDarkMode('dark');
   const [province, setProvince] = useLocalStorage<Province>('taxapp:province', DEFAULT_PROVINCE)
+  const { isPremium, enable } = usePremium()
   const [items, setItems] = useState<LineItemForm[]>([createLineItem(1)])
   const [notice, setNotice] = useState<string | null>(null)
-  const [resultsVersion, setResultsVersion] = useState(0)
   const [emailNotice, setEmailNotice] = useState<string | null>(null)
   const [isPremiumModalOpen, setPremiumModalOpen] = useState(false)
   const [isReferencesModalOpen, setReferencesModalOpen] = useState(false)
   const [isTaxInfoModalOpen, setTaxInfoModalOpen] = useState(false)
-  const emailNoticeTimeoutRef = useRef<ReturnType<typeof setTimeout>>()
-  const noticeTimeoutRef = useRef<ReturnType<typeof setTimeout>>()
+  const emailNoticeTimeoutRef = useRef<number | null>(null)
+  const noticeTimeoutRef = useRef<number | null>(null)
 
   const numericItems = useMemo<LineItemInput[]>(
     () => items.map((item) => ({ amount: parseAmount(item.amount), category: item.category })),
@@ -234,6 +245,8 @@ export default function TaxSmartCalculator() {
     [numericItems, province]
   )
 
+  const paymentLink = import.meta.env.VITE_STRIPE_PAYMENT_LINK as string | undefined
+
   const provincialLabel = getProvincialLabel(TAX_RATES[province].kind)
   const provincialRate = getProvincialRate(province)
 
@@ -244,6 +257,17 @@ export default function TaxSmartCalculator() {
     }
     noticeTimeoutRef.current = window.setTimeout(() => setNotice(null), 1800)
   }, [])
+
+  const handleUpgrade = useCallback(() => {
+    if (paymentLink) {
+      // Open Stripe Payment Link; configure Stripe to redirect back with ?premium=1
+      window.open(paymentLink, '_blank', 'noopener')
+      return
+    }
+    // Fallback: local toggle for development
+    enable()
+    showNotice('Premium enabled locally')
+  }, [paymentLink, enable, showNotice])
 
   const showEmailNotice = useCallback((message: string) => {
     setEmailNotice(message)
@@ -288,11 +312,6 @@ export default function TaxSmartCalculator() {
     setItems((current) => current.map((item) => (item.id === id ? { ...item, ...patch } : item)))
   }, [showNotice])
 
-  const handleCalculate = useCallback(() => {
-    setResultsVersion((version) => version + 1)
-    showNotice('Totals refreshed')
-  }, [showNotice])
-
   const handleCopyShareLink = useCallback(async () => {
     const parts = [
       `Province: ${province}`,
@@ -329,10 +348,10 @@ export default function TaxSmartCalculator() {
   // Auto-calculated via useMemo with [numericItems, province] dependency
 
   useEffect(() => () => {
-    if (emailNoticeTimeoutRef.current) {
+    if (emailNoticeTimeoutRef.current !== null) {
       window.clearTimeout(emailNoticeTimeoutRef.current)
     }
-    if (noticeTimeoutRef.current) {
+    if (noticeTimeoutRef.current !== null) {
       window.clearTimeout(noticeTimeoutRef.current)
     }
   }, [])
@@ -403,6 +422,9 @@ export default function TaxSmartCalculator() {
           >
             <Sparkles className="h-3.5 w-3.5" aria-hidden />
             <span>Premium coming soon</span>
+          </button>
+          <button type="button" className="btn" onClick={handleUpgrade}>
+            Go Premium
           </button>
           <button
             type="button"
@@ -600,17 +622,19 @@ export default function TaxSmartCalculator() {
                       )
                     })}
                   </select>
-                  <button
-                    type="button"
-                    className="select-info-button"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setTaxInfoModalOpen(true);
-                    }}
-                    aria-label="View category information"
-                  >
-                    <Info className="h-4 w-4" />
-                  </button>
+                  {index === 0 && (
+                    <button
+                      type="button"
+                      className="select-info-button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setTaxInfoModalOpen(true);
+                      }}
+                      aria-label="View category information"
+                    >
+                      <Info className="h-4 w-4" />
+                    </button>
+                  )}
                 </div>
                 <label className="sr-only" htmlFor={`amount-${item.id}`}>
                   Item amount
@@ -654,6 +678,18 @@ export default function TaxSmartCalculator() {
               </div>
             ))}
           </div>
+          {!isPremium && (
+            <div className="ad-wrapper">
+              <AdSlot slot={(import.meta.env.VITE_ADSENSE_SLOT_INLINE as string) || ''} />
+            </div>
+          )}
+          {!isPremium && (
+            <UpgradePrompt
+              feature="Ad-free experience"
+              description="Remove ads and support continued development."
+              onUpgrade={handleUpgrade}
+            />
+          )}
           <div className="line-items-actions">
             <div className="preset-dropdown">
               <select
@@ -680,9 +716,6 @@ export default function TaxSmartCalculator() {
                 </optgroup>
               </select>
             </div>
-            <button type="button" className="btn primary" onClick={handleCalculate}>
-              Calculate tax
-            </button>
           </div>
           <p className="line-items-note" role="note">
             Custom multi-item presets arrive with premium. Edit any row above or use a preset to
@@ -690,7 +723,7 @@ export default function TaxSmartCalculator() {
           </p>
         </section>
 
-        <section key={resultsVersion} className="panel">
+        <section className="panel totals-panel">
           <div className="panel-header">
             <h2 className="panel-title">Totals</h2>
             <div className="header-actions">
@@ -754,7 +787,7 @@ export default function TaxSmartCalculator() {
       </main>
 
       <footer className="calculator-footer">
-        <span>Built for Canadians. Totally free. No ads.</span>
+        <span>Built for Canadians. Free and ad-supported. Upgrade to Premium for no ads.</span>
         <div className="sponsor-embed sponsor-embed--footer" aria-hidden="true">
           <iframe
             src="https://github.com/sponsors/SolutionsRMe/button"

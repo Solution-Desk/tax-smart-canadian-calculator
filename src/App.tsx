@@ -2,6 +2,11 @@ import React from 'react';
 import { Footer } from './components/Footer';
 import ErrorBoundary from './ErrorBoundary';
 import TaxSmartCalculator from './components/TaxSmartCalculator/TaxSmartCalculator';
+import { Routes, Route } from 'react-router-dom';
+import Privacy from './pages/Privacy';
+import Premium from './pages/Premium';
+import { ConsentBanner } from './components/ConsentBanner';
+import { PremiumActivator } from './components/PremiumActivator';
 
 // Error fallback component
 const ErrorFallback = () => (
@@ -26,10 +31,16 @@ export default function App() {
   return (
     <div className="app-container">
       <ErrorBoundary fallback={<ErrorFallback />}>
+        <PremiumActivator />
         <main className="main-content">
-          <TaxSmartCalculator />
+          <Routes>
+            <Route path="/" element={<TaxSmartCalculator />} />
+            <Route path="/privacy" element={<Privacy />} />
+            <Route path="/premium" element={<Premium />} />
+          </Routes>
         </main>
         <Footer />
+        <ConsentBanner />
       </ErrorBoundary>
     </div>
   );
