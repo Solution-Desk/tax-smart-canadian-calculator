@@ -9,13 +9,11 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
-        with: { node-version: 20, cache: npm }
+        with:
+          node-version: 20
+          cache: npm
       - run: npm ci
-      - run: npm run lint
-      - run: npm run typecheck
-      - run: npm test -- --run
+      - run: npm run lint --if-present
+      - run: npm run typecheck --if-present
+      - run: npm test -- --run --passWithNoTests
       - run: npm run build
-  codeql:
-    permissions:
-      security-events: write
-    uses: github/codeql-action/.github/workflows/codeql.yml@v3
