@@ -1,130 +1,160 @@
 <div align="center">
-TaxSmart
 
-Canadian Sales-Tax Calculator (GST / HST / PST / QST)
+# TaxSmart — Canadian Sales-Tax Calculator
 
-Live app
- • Issues
- • Discussions
+**GST • HST • PST • QST — fast, accurate totals with shareable scenarios**
 
-</div> <div align="center"> <img src="assets/app-image.jpg" alt="TaxSmart app showing province selector, line items, and GST/HST/PST/QST breakdown to total" width="1000"> <br/> <sub>Example scenario with province selection, line items, and clear tax breakdown.</sub> </div>
-Overview
+[![Website](https://img.shields.io/badge/Live%20App-taxapp.thesolutiondesk.ca-2b6cb0?labelColor=0b1020\&logo=globe\&logoColor=white)](https://taxapp.thesolutiondesk.ca/)
+![Built with](https://img.shields.io/badge/Vite-React%20%2B%20TypeScript-5e5eff?labelColor=0b1020\&logo=vite\&logoColor=white)
+![License](https://img.shields.io/badge/License-MIT-10b981?labelColor=0b1020)
 
-TaxSmart is a fast, privacy-first calculator for Canadian sales taxes across provinces and territories. It’s built for shoppers, freelancers, and small businesses who need clear line-item math and shareable scenarios—without accounts or tracking.
+</div>
 
-Audience: Anyone who needs accurate totals, fast.
+<p align="center">
+  <img src="./assets/app-image.jpg" alt="TaxSmart app showing province selector, line items, and GST/HST/PST/QST breakdown" width="820">
+</p>
 
-Design goals: Simple, accessible, mobile-friendly, and safe to share.
+---
 
-Features
+## Overview
 
-Province/territory-aware rates (GST/HST/PST/QST)
+**TaxSmart** is a privacy-first calculator for Canadian sales taxes across provinces and territories.
+It’s built for shoppers, freelancers, and small businesses who need clear line-item math and **shareable scenarios**—without accounts or tracking.
 
-Line items with per-item price and quantity
+* **Province/territory-aware rates:** GST / HST / PST / QST
+* **Line items:** price × quantity with automatic tax breakdown
+* **Clear totals:** `subtotal → taxes → total`
+* **Shareable:** copy the page URL to share a scenario
+* **Responsive & keyboard-friendly** (works great on mobile and desktop)
+* **No sign-in required** for the core calculator
 
-Clear breakdown: subtotal → taxes → total
+> **Live app:** [https://taxapp.thesolutiondesk.ca/](https://taxapp.thesolutiondesk.ca/)
 
-Shareable scenarios via URL (copy/paste a link)
+---
 
-Responsive, keyboard-friendly UI (dark/light ready)
+## Quick Start
 
-No account required for the core calculator
+**Requirements:** Node 20+ and npm.
 
-Quick Start
+```bash
+# 1) Install
+npm ci
 
-Requires Node 20+ and npm.
+# 2) Run locally (Vite dev server)
+npm run dev
 
-npm ci            # install dependencies
-npm run dev       # start local dev server (prints a localhost URL)
-npm run build     # production build → dist/
-npm run preview   # preview the production build locally
+# 3) Production build
+npm run build
 
-How to Use
+# 4) Preview the production build
+npm run preview
+```
 
-Select your province/territory.
+> The dev server prints a localhost URL. Open it to use TaxSmart during development.
 
-Add items (price & quantity).
+---
 
-Review the tax breakdown and total.
+## How to Use
 
-Copy the page URL to share the scenario.
+1. Select your **province/territory**.
+2. Add **items** (unit price & quantity).
+3. Review the **tax breakdown and total**.
+4. **Copy the URL** to share the scenario (bookmark frequent scenarios).
 
-Tip: Bookmark frequently used scenarios.
+---
 
-Project Structure
+## Tech Stack
+
+* **Vite** + **React** + **TypeScript**
+* Lightweight state + utility libs
+* Simple, accessible UI with sensible defaults
+
+---
+
+## Project Structure
+
+```
 tax-smart-canadian-calculator/
-├─ public/                  # static assets
-├─ assets/                  # repo images (README, social, etc.)
+├─ public/           # static assets
+├─ assets/           # repo images (README/social)
 ├─ src/
-│  ├─ components/           # UI components
-│  ├─ lib/                  # tax helpers & utilities
-│  ├─ styles/               # global styles (if applicable)
-│  ├─ App.tsx               # root app
-│  └─ main.tsx              # Vite entry
+│  ├─ components/    # UI components
+│  ├─ lib/           # tax helpers & utilities
+│  ├─ styles/        # global styles (if applicable)
+│  ├─ App.tsx        # root app
+│  └─ main.tsx       # Vite entry
 ├─ index.html
 ├─ package.json
 └─ vite.config.ts
+```
 
-Accessibility
+---
 
-We aim for sensible defaults:
+## Accessibility
 
-Labeled controls, descriptive alt text, and visible focus states
+We aim for **WCAG-sensible defaults**:
 
-Keyboard navigation for all interactive elements
+* Labeled controls, descriptive `alt` text, visible focus states
+* Full keyboard navigation for interactive elements
+* Contrast targets near **AA** where feasible
 
-Contrast targets WCAG AA where feasible
+If you hit an accessibility snag, please open an issue with your **browser/OS/assistive-tech** details.
 
-If you hit an accessibility snag, open an issue
- with your browser/OS/assistive-tech details.
+---
 
-Privacy & Accuracy
+## Privacy & Accuracy
 
-Privacy: The core calculator does not require accounts or collect personal data.
+* **Privacy:** the core calculator doesn’t require accounts or collect personal data.
+* **Accuracy:** rates are maintained with best efforts, but tax outcomes vary by context.
+* **Disclaimer:** This tool is informational only and **not** tax or financial advice.
+  For authoritative guidance, verify with the **CRA** and your province/territory tax authority.
 
-Accuracy: Rates are maintained with best efforts, but tax outcomes vary by context.
+---
 
-Disclaimer: This tool is informational only and not tax or financial advice.
-For authoritative guidance, verify with the CRA and your province/territory’s tax authority.
+## Troubleshooting
 
-Roadmap
+* **Blank page after deploy**
+  Ensure built files are served from the correct base path
+  (Vite’s `base` option must match your hosting subpath, if any).
 
-CSV import/export
+* **Styles not applying**
+  Confirm CSS is present in `dist/` and referenced by `index.html`.
 
-Saved scenarios (local-first)
+* **Module not found**
+  Run `npm ci` to install a clean dependency set.
 
-Small-business presets
+---
 
-In-app links to official rate sources
+## Roadmap
 
-Print-friendly layout
+* CSV import/export
+* Saved scenarios (local-first)
+* Small-business presets
+* In-app links to official rate sources
+* Print-friendly layout
 
-Have an idea? Propose it in Issues
- or start a thread in Discussions
-.
+Have an idea? Open an **Issue** or start a **Discussion**.
 
-Contributing
+---
+
+## Contributing
 
 Contributions are welcome!
 
-Fork the repo and create a feature branch.
+1. Fork the repo & create a feature branch.
+2. Make focused changes with clear commit messages.
+3. If you change **tax logic or rates**, update `CHANGELOG.md` and link sources.
+4. Open a PR describing what changed and why (screenshots welcome).
 
-Make focused changes with clear commit messages.
+Please review:
 
-If you change tax logic or rates, update CHANGELOG.md and link sources.
+* [`CODE_OF_CONDUCT.md`](./CODE_OF_CONDUCT.md)
+* [`CONTRIBUTING.md`](./CONTRIBUTING.md)
+* [`SECURITY.md`](./SECURITY.md)
+* [`SUPPORT.md`](./SUPPORT.md)
 
-Open a Pull Request describing what changed and why (screenshots welcome).
+---
 
-Please review: CODE_OF_CONDUCT.md, CONTRIBUTING.md, SECURITY.md, SUPPORT.md.
-
-Troubleshooting
-
-Blank page after deploy: Ensure the built files are served from the correct base path (vite.config.ts base option if hosted under a subpath).
-
-Styles not applying: Confirm CSS is present in dist/ and referenced by index.html.
-
-Module not found: Run npm ci to install a clean dependency set.
-
-License
+## License
 
 MIT © The Solution Desk
