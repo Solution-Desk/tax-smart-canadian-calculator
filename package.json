@@ -66,3 +66,13 @@
     "url": "https://github.com/solutionsrme/canada-tax-smart-calc/issues"
   }
 }
+{
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "lint": "eslint . --ext .ts,.tsx,.js,.jsx",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest"
+  }
+}
