@@ -154,19 +154,27 @@ const COMING_SOON_FEATURES = [
 ];
 
 const PREMIUM_CATEGORY_SET = new Set(PREMIUM_CATEGORIES);
+function isPremiumCategory(category: Category) { return PREMIUM_CATEGORY_SET.has(category); }
 
-function isPremiumCategory(category: Category) {
-  return PREMIUM_CATEGORY_SET.has(category);
+// --- Added: simple keyword-based category suggestion helper ---
+const KEYWORDS: Array<{ cat: Category; keys: string[] }> = [
+  { cat: 'Zero-rated (basic groceries)', keys: ['bread','milk','eggs','flour','rice','vegetable','fruit','banana','apple','pasta','meat','cheese','butter','yogurt','oil','sugar','spice'] },
+  { cat: 'Prepared food / restaurant',   keys: ['burger','pizza','fries','sandwich','takeout','restaurant','coffee','latte','soda','pop','donut','doughnut'] },
+  { cat: 'Prescription drugs / medical', keys: ['rx','prescription','insulin','inhaler','antibiotic'] },
+  { cat: 'Printed books (qualifying)',   keys: ['book','novel','textbook','magazine','newspaper'] },
+];
+function suggestCategoryFrom(desc: string): Category {
+  const d = String(desc || '').toLowerCase();
+  for (const g of KEYWORDS) if (g.keys.some(k => d.includes(k))) return g.cat;
+  return 'Standard';
 }
 
 function generateId(): string {
   try {
-    // Use the most robust API when available
     if (typeof crypto !== 'undefined' && 'randomUUID' in crypto) {
       return (crypto as Crypto & { randomUUID?: () => string }).randomUUID!();
     }
   } catch {}
-  // Fallback: reasonably unique ID
   return Math.random().toString(36).slice(2) + Date.now().toString(36)
 }
 
@@ -185,15 +193,8 @@ function parseAmount(amount: string): number {
   return isNaN(parsed) ? 0 : parsed;
 }
 
-function formatCurrency(value: number) {
-  return CURRENCY.format(value)
-}
-
-function formatPercent(value: number) {
-  return `${PERCENT_FORMATTER.format(value * 100)}%`
-}
-
-// Consistent percent formatting for category info badges
+function formatCurrency(value: number) { return CURRENCY.format(value) }
+function formatPercent(value: number) { return `${PERCENT_FORMATTER.format(value * 100)}%` }
 function formatRatePct(rateDecimal: number | undefined): string {
   const val = (rateDecimal ?? 0) * 100
   const isInt = Math.abs(val - Math.round(val)) < 1e-9
@@ -203,23 +204,13 @@ function formatRatePct(rateDecimal: number | undefined): string {
 
 async function copyToClipboard(value: string) {
   if (typeof navigator !== 'undefined' && navigator.clipboard?.writeText) {
-    try {
-      await navigator.clipboard.writeText(value)
-      return true
-    } catch (error) {
-      console.warn('Clipboard write failed', error)
-      return false
-    }
+    try { await navigator.clipboard.writeText(value); return true } catch { return false }
   }
   return false
 }
 
 function toShareableItems(items: LineItemForm[]) {
-  return items.map(({ label, category, amount }) => ({
-    label,
-    category,
-    amount,
-  }))
+  return items.map(({ label, category, amount }) => ({ label, category, amount }))
 }
 
 export default function TaxSmartCalculator() {
@@ -227,6 +218,11 @@ export default function TaxSmartCalculator() {
   const [province, setProvince] = useLocalStorage<Province>('taxapp:province', DEFAULT_PROVINCE)
   const { isPremium, enable } = usePremium()
   const [items, setItems] = useState<LineItemForm[]>([createLineItem(1)])
+
+  // --- Added: tiny helper state per row ---
+  const [helperGuess, setHelperGuess] = useState<string[]>([])
+  const [suggestedCat, setSuggestedCat] = useState<Record<string, Category>>({})
+
   const [notice, setNotice] = useState<string | null>(null)
   const [emailNotice, setEmailNotice] = useState<string | null>(null)
   const [isPremiumModalOpen, setPremiumModalOpen] = useState(false)
@@ -246,114 +242,33 @@ export default function TaxSmartCalculator() {
   )
 
   const paymentLink = import.meta.env.VITE_STRIPE_PAYMENT_LINK as string | undefined
-
   const provincialLabel = getProvincialLabel(TAX_RATES[province].kind)
   const provincialRate = getProvincialRate(province)
 
   const showNotice = useCallback((message: string) => {
     setNotice(message)
-    if (noticeTimeoutRef.current) {
-      window.clearTimeout(noticeTimeoutRef.current)
-    }
+    if (noticeTimeoutRef.current) window.clearTimeout(noticeTimeoutRef.current)
     noticeTimeoutRef.current = window.setTimeout(() => setNotice(null), 1800)
   }, [])
 
   const handleUpgrade = useCallback(() => {
     if (paymentLink) {
-      // Open Stripe Payment Link; configure Stripe to redirect back with ?premium=1
       window.open(paymentLink, '_blank', 'noopener')
       return
     }
-    // Fallback: local toggle for development
     enable()
     showNotice('Premium enabled locally')
   }, [paymentLink, enable, showNotice])
 
   const showEmailNotice = useCallback((message: string) => {
     setEmailNotice(message)
-    if (emailNoticeTimeoutRef.current) {
-      window.clearTimeout(emailNoticeTimeoutRef.current)
-    }
+    if (emailNoticeTimeoutRef.current) window.clearTimeout(emailNoticeTimeoutRef.current)
     emailNoticeTimeoutRef.current = window.setTimeout(() => setEmailNotice(null), 1800)
   }, [])
 
-  const handleAddItem = useCallback((presetOrEvent?: (typeof TAX_PRESETS)[number] | React.MouseEvent) => {
-    if (presetOrEvent && 'preventDefault' in presetOrEvent) {
-      presetOrEvent.preventDefault();
-      setItems((current) => [...current, createLineItem(current.length + 1)]);
-      return;
-    }
-
-    const preset = presetOrEvent as (typeof TAX_PRESETS)[number] | undefined;
-    if (preset?.category && isPremiumCategory(preset.category)) {
-      showNotice('Coming soon: premium items like dining, cannabis, and alcohol');
-      return;
-    }
-
-    setItems((current) => [
-      ...current,
-      createLineItem(current.length + 1, {
-        label: preset?.label || '',
-        category: preset?.category || 'Standard',
-      })
-    ]);
-  }, [showNotice])
-
-  const handleRemoveItem = useCallback((id: string) => {
-    setItems((current) => (current.length > 1 ? current.filter((item) => item.id !== id) : current))
-  }, [])
-
-  const handleUpdateItem = useCallback((id: string, patch: Partial<LineItemForm>) => {
-    if (patch.category && isPremiumCategory(patch.category as Category)) {
-      showNotice('Coming soon: premium items like dining, cannabis, and alcohol');
-      return;
-    }
-
-    setItems((current) => current.map((item) => (item.id === id ? { ...item, ...patch } : item)))
-  }, [showNotice])
-
-  const handleCopyShareLink = useCallback(async () => {
-    const parts = [
-      `Province: ${province}`,
-      `Subtotal: ${formatCurrency(totals.subTotal)}`,
-      TAX_RATES[province].kind === 'HST'
-        ? `HST: ${formatCurrency(totals.hst)}`
-        : `GST: ${formatCurrency(totals.federal)}\n${provincialLabel}: ${formatCurrency(totals.provincial)}`,
-      `Total tax: ${formatCurrency(totals.tax)}`,
-      `Grand total: ${formatCurrency(totals.grandTotal)}`,
-    ]
-    const success = await copyToClipboard(parts.join('\n'))
-    showNotice(success ? 'Results copied to clipboard' : 'Clipboard not available')
-  }, [province, provincialLabel, showNotice, totals])
-
-  const handleCopyAppLink = useCallback(async () => {
-    if (typeof window === 'undefined') return
-    const shareUrl = new URL(window.location.href)
-    shareUrl.hash = encodeState({ province, items: toShareableItems(items) })
-    const success = await copyToClipboard(shareUrl.toString())
-    showNotice(success ? 'Shareable link copied' : 'Clipboard not available')
-  }, [items, province, showNotice])
-
-  const handleCopyEmail = useCallback(async () => {
-    const success = await copyToClipboard(CONTACT_EMAIL)
-    if (success) {
-      showEmailNotice('Copied to clipboard')
-      return
-    }
-
-    showEmailNotice('Opening email app…')
-    window.location.href = `mailto:${CONTACT_EMAIL}`
-  }, [showEmailNotice])
-
-  // Auto-calculated via useMemo with [numericItems, province] dependency
-
   useEffect(() => () => {
-    if (emailNoticeTimeoutRef.current !== null) {
-      window.clearTimeout(emailNoticeTimeoutRef.current)
-    }
-    if (noticeTimeoutRef.current !== null) {
-      window.clearTimeout(noticeTimeoutRef.current)
-    }
+    if (emailNoticeTimeoutRef.current !== null) window.clearTimeout(emailNoticeTimeoutRef.current)
+    if (noticeTimeoutRef.current !== null) window.clearTimeout(noticeTimeoutRef.current)
   }, [])
 
   useEffect(() => {
@@ -622,6 +537,51 @@ export default function TaxSmartCalculator() {
                       )
                     })}
                   </select>
+
+                  {/* Added: helper to suggest a category from a typed item */}
+                  <div className="helper mt-2">
+                    <label className="helper-label">Not sure of the category?</label>
+                    <div className="helper-row">
+                      <input
+                        className="input"
+                        placeholder="Type item (e.g., 'milk', 'pizza')"
+                        value={helperGuess[index] ?? ''}
+                        onChange={(e) => {
+                          const next = [...helperGuess];
+                          next[index] = e.target.value;
+                          setHelperGuess(next);
+                        }}
+                      />
+                      <button
+                        type="button"
+                        className="btn small"
+                        onClick={() => {
+                          const guess = suggestCategoryFrom(helperGuess[index] ?? '');
+                          setSuggestedCat({ ...suggestedCat, [item.id]: guess });
+                        }}
+                      >
+                        Suggest
+                      </button>
+
+                      {suggestedCat[item.id] && (
+                        <button
+                          type="button"
+                          className="btn small ghost"
+                          onClick={() => {
+                            handleUpdateItem(item.id, { category: suggestedCat[item.id] });
+                            const next = [...helperGuess];
+                            next[index] = '';
+                            setHelperGuess(next);
+                            const { [item.id]: _ignored, ...rest } = suggestedCat;
+                            setSuggestedCat(rest);
+                          }}
+                        >
+                          Apply {suggestedCat[item.id]}
+                        </button>
+                      )}
+                    </div>
+                  </div>
+
                   {index === 0 && (
                     <button
                       type="button"
@@ -646,12 +606,10 @@ export default function TaxSmartCalculator() {
                     className="input"
                     value={item.amount}
                     onChange={(event) => {
-                      // Only allow numbers and decimal points
                       const value = event.target.value.replace(/[^0-9.]/g, '');
                       handleUpdateItem(item.id, { amount: value });
                     }}
                     onBlur={(event) => {
-                      // Format the number with 2 decimal places when input loses focus
                       if (event.target.value) {
                         const num = parseFloat(event.target.value);
                         if (!isNaN(num)) {
