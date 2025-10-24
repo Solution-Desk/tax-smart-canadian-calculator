@@ -29,6 +29,55 @@ type TaxCategoryInfo = {
   taxRates: string;
   examples: string[];
 };
+// --- Required handlers (missing previously) ---
+
+const handleUpdateItem = (id: string, changes: Partial<LineItemForm>) => {
+  setItems(prev => prev.map(it => it.id === id ? { ...it, ...changes } : it));
+};
+
+const handleRemoveItem = (id: string) => {
+  setItems(prev => prev.filter(it => it.id !== id));
+};
+
+const handleAddItem = (overrides?: Partial<LineItemForm>) => {
+  setItems(prev => [...prev, createLineItem(prev.length + 1, overrides ?? {})]);
+};
+
+const handleCopyAppLink = async () => {
+  if (typeof window === 'undefined') return;
+  const url = `${window.location.origin}${window.location.pathname}`;
+  try {
+    await navigator.clipboard.writeText(url);
+    showNotice('App link copied');
+  } catch {
+    showNotice('Could not copy link');
+  }
+};
+
+const handleCopyShareLink = async () => {
+  if (typeof window === 'undefined') return;
+  const shareState = {
+    province,
+    items: items.map(({ label, category, amount }) => ({ label, category, amount })),
+  };
+  const hash = encodeState(shareState); // from src/lib/share
+  const url = `${window.location.origin}${window.location.pathname}#${hash}`;
+  try {
+    await navigator.clipboard.writeText(url);
+    showNotice('Shareable link copied');
+  } catch {
+    showNotice('Could not copy link');
+  }
+};
+
+const handleCopyEmail = async () => {
+  try {
+    await navigator.clipboard.writeText(CONTACT_EMAIL);
+    showEmailNotice('Email copied');
+  } catch {
+    showEmailNotice('Could not copy email');
+  }
+};
 
 const getCategoryInfo = (province: string): TaxCategoryInfo[] => [
   {
