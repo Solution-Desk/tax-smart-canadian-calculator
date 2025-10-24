@@ -17,6 +17,7 @@ export default defineConfig(({ mode }) => {
       VitePWA({
         registerType: 'autoUpdate',
         injectRegister: 'auto',
+        strategies: 'generateSW',
         manifest: {
           name: 'TaxSmart · Canada Sales-Tax Calculator',
           short_name: 'TaxSmart',
@@ -33,15 +34,21 @@ export default defineConfig(({ mode }) => {
               src: '/icon.svg',
               sizes: 'any',
               type: 'image/svg+xml',
-              purpose: 'any'
+              purpose: 'any maskable'
             }
           ],
         },
         workbox: {
           globPatterns: ['**/*.{js,css,html,ico,png,svg}'],
-          navigateFallback: base.endsWith('/') ? `${base}index.html` : `${base}/index.html`,
+          navigateFallback: '/index.html',
+          cleanupOutdatedCaches: true,
+          clientsClaim: true,
+          skipWaiting: true,
         },
-      }),
+        devOptions: {
+          enabled: false
+        }
+      })
     ],
     base,
     test: {

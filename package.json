@@ -34,15 +34,19 @@
     "preview": "vite preview",
     "test": "vitest",
     "typecheck": "tsc --noEmit",
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d dist -b gh-pages",
+    "preview:deploy": "npm run build && npm run deploy && npx serve -s dist",
     "cap:sync": "vite build && npx cap sync",
     "cap:add:android": "npx cap add android",
     "cap:add:ios": "npx cap add ios",
     "cap:open:android": "npx cap open android",
     "cap:open:ios": "npx cap open ios"
   },
+  "homepage": "https://solution-desk.github.io/tax-smart-canadian-calculator/",
   "dependencies": {
     "@capacitor/core": "^6.2.1",
-    "lucide-react": "^0.294.0",
+    "lucide-react": "^0.548.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-router-dom": "^6.20.1",
@@ -61,8 +65,9 @@
     "jsdom": "^23.0.1",
     "typescript": "^5.4.5",
     "vite": "^5.4.21",
-    "vite-plugin-pwa": "^0.20.5",
-    "vitest": "^4.0.3"
+    "vite-plugin-pwa": "^1.1.0",
+    "vitest": "^4.0.3",
+    "workbox-window": "^7.3.0"
   },
   "capacitor": {
     "ios": {},
