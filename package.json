@@ -46,13 +46,13 @@
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-router-dom": "^6.20.1",
-    "zustand": "^4.4.7"
+    "zustand": "^5.0.8"
   },
   "devDependencies": {
     "@capacitor/cli": "^7.4.3",
     "@testing-library/jest-dom": "^6.1.5",
     "@testing-library/react": "^16.3.0",
-    "@types/node": "^20.10.0",
+    "@types/node": "^24.9.1",
     "@types/react": "^18.3.3",
     "@types/react-dom": "^18.3.0",
     "@vitejs/plugin-react": "^4.3.1",
