@@ -1,26 +1,160 @@
-# TaxSmart · Canadian Sales-Tax Calculator
+<div align="center">
 
-Visit the live experience at **https://taxapp.thesolutiondesk.ca** for an always up-to-date view of Canadian GST/HST/PST/QST calculations tailored for individuals.
+# TaxSmart — Canadian Sales-Tax Calculator
 
-## What You’ll See
-- Province-aware totals sourced from current CRA and provincial guidance.
-- Category presets that cover common retail, professional, and goods scenarios.
-- Copy/share tools that let you hand off calculations without spreadsheets or screenshots.
-- Dark and light themes that respond to your system preference.
+**GST • HST • PST • QST — fast, accurate totals with shareable scenarios**
 
-## Why Individuals Use TaxSmart
-- **Accuracy:** See the applicable federal + provincial rates per line, eliminating guesswork when budgeting or comparing offers.
-- **Speed:** Add or remove items in seconds and watch totals update instantly.
-- **Sharing:** Copy a link so family members or advisors can review the exact scenario you prepared.
-- **Access:** No account required for the core calculator; it just works on desktop, tablet, and mobile.
+[![Website](https://img.shields.io/badge/Live%20App-taxapp.thesolutiondesk.ca-2b6cb0?labelColor=0b1020\&logo=globe\&logoColor=white)](https://taxapp.thesolutiondesk.ca/)
+![Built with](https://img.shields.io/badge/Vite-React%20%2B%20TypeScript-5e5eff?labelColor=0b1020\&logo=vite\&logoColor=white)
+![License](https://img.shields.io/badge/License-MIT-10b981?labelColor=0b1020)
 
-## Premium Roadmap
-Paid add-ons are in private beta. Drop a note to [taxapp@thesolutiondesk.ca](mailto:taxapp@thesolutiondesk.ca) with your use case to join the waitlist or learn about partnership opportunities.
+</div>
 
-## Need a Hand?
-- Email: [taxapp@thesolutiondesk.ca](mailto:taxapp@thesolutiondesk.ca)
-- Status page: https://taxapp.thesolutiondesk.ca/health.html
+<p align="center">
+  <img src="./assets/app-image.jpg" alt="TaxSmart app showing province selector, line items, and GST/HST/PST/QST breakdown" width="820">
+</p>
 
 ---
 
-Developers looking to contribute can head to [`CONTRIBUTING.md`](CONTRIBUTING.md) for the full build-and-release workflow. The public site remains the source of truth for end users.
+## Overview
+
+**TaxSmart** is a privacy-first calculator for Canadian sales taxes across provinces and territories.
+It’s built for shoppers, freelancers, and small businesses who need clear line-item math and **shareable scenarios**—without accounts or tracking.
+
+* **Province/territory-aware rates:** GST / HST / PST / QST
+* **Line items:** price × quantity with automatic tax breakdown
+* **Clear totals:** `subtotal → taxes → total`
+* **Shareable:** copy the page URL to share a scenario
+* **Responsive & keyboard-friendly** (works great on mobile and desktop)
+* **No sign-in required** for the core calculator
+
+> **Live app:** [https://taxapp.thesolutiondesk.ca/](https://taxapp.thesolutiondesk.ca/)
+
+---
+
+## Quick Start
+
+**Requirements:** Node 20+ and npm.
+
+```bash
+# 1) Install
+npm ci
+
+# 2) Run locally (Vite dev server)
+npm run dev
+
+# 3) Production build
+npm run build
+
+# 4) Preview the production build
+npm run preview
+```
+
+> The dev server prints a localhost URL. Open it to use TaxSmart during development.
+
+---
+
+## How to Use
+
+1. Select your **province/territory**.
+2. Add **items** (unit price & quantity).
+3. Review the **tax breakdown and total**.
+4. **Copy the URL** to share the scenario (bookmark frequent scenarios).
+
+---
+
+## Tech Stack
+
+* **Vite** + **React** + **TypeScript**
+* Lightweight state + utility libs
+* Simple, accessible UI with sensible defaults
+
+---
+
+## Project Structure
+
+```
+tax-smart-canadian-calculator/
+├─ public/           # static assets
+├─ assets/           # repo images (README/social)
+├─ src/
+│  ├─ components/    # UI components
+│  ├─ lib/           # tax helpers & utilities
+│  ├─ styles/        # global styles (if applicable)
+│  ├─ App.tsx        # root app
+│  └─ main.tsx       # Vite entry
+├─ index.html
+├─ package.json
+└─ vite.config.ts
+```
+
+---
+
+## Accessibility
+
+We aim for **WCAG-sensible defaults**:
+
+* Labeled controls, descriptive `alt` text, visible focus states
+* Full keyboard navigation for interactive elements
+* Contrast targets near **AA** where feasible
+
+If you hit an accessibility snag, please open an issue with your **browser/OS/assistive-tech** details.
+
+---
+
+## Privacy & Accuracy
+
+* **Privacy:** the core calculator doesn’t require accounts or collect personal data.
+* **Accuracy:** rates are maintained with best efforts, but tax outcomes vary by context.
+* **Disclaimer:** This tool is informational only and **not** tax or financial advice.
+  For authoritative guidance, verify with the **CRA** and your province/territory tax authority.
+
+---
+
+## Troubleshooting
+
+* **Blank page after deploy**
+  Ensure built files are served from the correct base path
+  (Vite’s `base` option must match your hosting subpath, if any).
+
+* **Styles not applying**
+  Confirm CSS is present in `dist/` and referenced by `index.html`.
+
+* **Module not found**
+  Run `npm ci` to install a clean dependency set.
+
+---
+
+## Roadmap
+
+* CSV import/export
+* Saved scenarios (local-first)
+* Small-business presets
+* In-app links to official rate sources
+* Print-friendly layout
+
+Have an idea? Open an **Issue** or start a **Discussion**.
+
+---
+
+## Contributing
+
+Contributions are welcome!
+
+1. Fork the repo & create a feature branch.
+2. Make focused changes with clear commit messages.
+3. If you change **tax logic or rates**, update `CHANGELOG.md` and link sources.
+4. Open a PR describing what changed and why (screenshots welcome).
+
+Please review:
+
+* [`CODE_OF_CONDUCT.md`](./CODE_OF_CONDUCT.md)
+* [`CONTRIBUTING.md`](./CONTRIBUTING.md)
+* [`SECURITY.md`](./SECURITY.md)
+* [`SUPPORT.md`](./SUPPORT.md)
+
+---
+
+## License
+
+MIT © The Solution Desk
