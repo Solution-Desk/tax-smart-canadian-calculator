@@ -74,7 +74,7 @@
     "test": "vitest",
     "typecheck": "tsc --noEmit",
     "predeploy": "npm run build",
-    "deploy": "gh-pages -d dist -b gh-pages",
+    "deploy": "gh-pages -d dist -b gh-pages --repo git@github.com:Solution-Desk/tax-smart-canadian-calculator.git",
     "preview:deploy": "npm run build && npm run deploy && npx serve -s dist",
     "cap:sync": "vite build && npx cap sync",
     "cap:add:android": "npx cap add android",
