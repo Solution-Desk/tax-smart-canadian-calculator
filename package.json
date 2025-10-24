@@ -3,12 +3,37 @@
   "private": true,
   "version": "1.0.0",
   "type": "module",
+  "description": "Canada GST / HST / PST / QST calculator with category-specific overrides and shareable state.",
+  "author": "Canada Tax Smart Calc maintainers",
+  "license": "MIT",
+  "keywords": [
+    "canada",
+    "gst",
+    "hst",
+    "pst",
+    "qst",
+    "tax",
+    "calculator",
+    "react",
+    "vite",
+    "typescript"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/solutionsrme/canada-tax-smart-calc.git"
+  },
+  "bugs": {
+    "url": "https://github.com/solutionsrme/canada-tax-smart-calc/issues"
+  },
+  "engines": {
+    "node": ">=20"
+  },
   "scripts": {
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
     "test": "vitest",
-    "type-check": "tsc --noEmit",
+    "typecheck": "tsc --noEmit",
     "cap:sync": "vite build && npx cap sync",
     "cap:add:android": "npx cap add android",
     "cap:add:ios": "npx cap add ios",
@@ -42,27 +67,5 @@
   "capacitor": {
     "ios": {},
     "android": {}
-  },
-  "description": "Canada GST / HST / PST / QST calculator with category-specific overrides and shareable state.",
-  "author": "Canada Tax Smart Calc maintainers",
-  "license": "MIT",
-  "keywords": [
-    "canada",
-    "gst",
-    "hst",
-    "pst",
-    "qst",
-    "tax",
-    "calculator",
-    "react",
-    "vite",
-    "typescript"
-  ],
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/solutionsrme/canada-tax-smart-calc.git"
-  },
-  "bugs": {
-    "url": "https://github.com/solutionsrme/canada-tax-smart-calc/issues"
   }
 }
