@@ -1,17 +1,12 @@
 ## Summary
-- [ ] Includes a clear description of the change and context for reviewers
-- [ ] References related issues or tickets (e.g. closes #123)
+- What does this change do?
 
-## Testing
-Describe how you tested this change. Include commands run and results.
-
-- [ ] `npm run build`
-- [ ] Additional notes:
-
-## Screenshots / recordings (optional)
-Add media to help reviewers understand UI or UX changes.
+## Screenshots / Demos
+- Link to scenario or preview URL
 
 ## Checklist
-- [ ] Documentation updated (README, ABOUT, or inline comments as needed)
-- [ ] Tests added or updated if logic changed
-- [ ] I have read and followed the [Code of Conduct](./CODE_OF_CONDUCT.md)
+- [ ] Unit tests added/updated
+- [ ] Lint passes (`npm run lint`)
+- [ ] Type checks pass (`npm run typecheck`)
+- [ ] No PII added; follows privacy policy
+- [ ] If rates changed, changelog entry added

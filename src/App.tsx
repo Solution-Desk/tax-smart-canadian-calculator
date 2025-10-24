@@ -1,66 +1,47 @@
-import React, { Suspense } from 'react';
-import { AuthWrapper } from './components/AuthWrapper';
+import React from 'react';
+import { Footer } from './components/Footer';
+import ErrorBoundary from './ErrorBoundary';
+import TaxSmartCalculator from './components/TaxSmartCalculator/TaxSmartCalculator';
+import { Routes, Route } from 'react-router-dom';
+import Privacy from './pages/Privacy';
+import Premium from './pages/Premium';
+import { ConsentBanner } from './components/ConsentBanner';
+import { PremiumActivator } from './components/PremiumActivator';
 
-// Lazy load the calculator to improve initial load time
-const TaxSmartCalculator = React.lazy(() => import('./components/TaxSmartCalculator/TaxSmartCalculator'));
-
-// Loading fallback component
-const LoadingFallback = () => (
-  <div className="min-h-screen flex items-center justify-center bg-white dark:bg-gray-900">
-    <div className="text-center">
-      <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-indigo-500 mx-auto mb-4"></div>
-      <p className="text-gray-600 dark:text-gray-300">Loading calculator...</p>
+// Error fallback component
+const ErrorFallback = () => (
+  <div className="min-h-screen flex items-center justify-center bg-white dark:bg-gray-900 p-4">
+    <div className="text-center max-w-md">
+      <div className="text-red-500 text-5xl mb-4">⚠️</div>
+      <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">Something went wrong</h1>
+      <p className="text-gray-600 dark:text-gray-300 mb-6">
+        We're sorry, but the calculator encountered an error. Please try refreshing the page or contact support if the issue persists.
+      </p>
+      <button
+        onClick={() => window.location.reload()}
+        className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition-colors"
+      >
+        Refresh Page
+      </button>
     </div>
   </div>
 );
 
-// Error boundary for the calculator
-class ErrorBoundary extends React.Component<{ children: React.ReactNode }, { hasError: boolean }> {
-  constructor(props: { children: React.ReactNode }) {
-    super(props);
-    this.state = { hasError: false };
-  }
-
-  static getDerivedStateFromError() {
-    return { hasError: true };
-  }
-
-  componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
-    console.error('Error in calculator:', error, errorInfo);
-  }
-
-  render() {
-    if (this.state.hasError) {
-      return (
-        <div className="min-h-screen flex items-center justify-center bg-white dark:bg-gray-900 p-4">
-          <div className="max-w-md w-full text-center">
-            <h2 className="text-2xl font-bold text-red-600 dark:text-red-400 mb-2">Something went wrong</h2>
-            <p className="text-gray-600 dark:text-gray-300 mb-6">
-              We're having trouble loading the calculator. Please refresh the page to try again.
-            </p>
-            <button
-              onClick={() => window.location.reload()}
-              className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition-colors"
-            >
-              Refresh Page
-            </button>
-          </div>
-        </div>
-      );
-    }
-
-    return this.props.children;
-  }
-}
-
 export default function App() {
   return (
-    <AuthWrapper>
-      <ErrorBoundary>
-        <Suspense fallback={<LoadingFallback />}>
-          <TaxSmartCalculator />
-        </Suspense>
+    <div className="app-container">
+      <ErrorBoundary fallback={<ErrorFallback />}>
+        <PremiumActivator />
+        <main className="main-content">
+          <Routes>
+            <Route path="/" element={<TaxSmartCalculator />} />
+            <Route path="/privacy" element={<Privacy />} />
+            <Route path="/premium" element={<Premium />} />
+          </Routes>
+        </main>
+        <Footer />
+        <ConsentBanner />
       </ErrorBoundary>
-    </AuthWrapper>
+    </div>
   );
 }

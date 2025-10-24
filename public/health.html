@@ -1,0 +1,49 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Health Check</title>
+    <meta http-equiv="Content-Security-Policy" content="
+      default-src 'self';
+      script-src 'self';
+      connect-src 'self';
+      frame-src 'self';
+      img-src 'self' data:;
+      style-src 'self' 'unsafe-inline';
+      base-uri 'self';
+      form-action 'self';">
+    <style>
+      body {
+        font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        background: #0b0f1a;
+        color: #e8e8f0;
+        padding: 2rem;
+        max-width: 640px;
+        margin: 0 auto;
+      }
+      main {
+        display: grid;
+        gap: 1.5rem;
+      }
+      ul {
+        margin: 0;
+        padding-left: 1.25rem;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <header>
+        <h1>TaxSmart Status</h1>
+        <p>Static build served successfully. No third-party billing widgets are loaded on this check.</p>
+      </header>
+      <section>
+        <h2>Next Steps</h2>
+        <ul>
+          <li>Visit the production app at <a href="/">taxapp.thesolutiondesk.ca</a>.</li>
+          <li>Contact <a href="mailto:taxapp@thesolutiondesk.ca">taxapp@thesolutiondesk.ca</a> for premium access inquiries.</li>
+        </ul>
+      </section>
+    </main>
+  </body>
+</html>

@@ -8,27 +8,18 @@ interface UpgradePromptProps {
 
 export function UpgradePrompt({ feature, description, onUpgrade }: UpgradePromptProps) {
   return (
-    <div className="bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200 rounded-lg p-4 mb-4">
-      <div className="flex items-start gap-3">
-        <div className="flex-shrink-0">
-          <Crown className="h-5 w-5 text-amber-600" />
-        </div>
-        <div className="flex-1">
-          <h3 className="text-sm font-medium text-amber-800">
-            {feature} requires Pro
-          </h3>
-          <p className="text-sm text-amber-700 mt-1">
-            {description || `Upgrade to Pro to unlock ${feature.toLowerCase()} and more premium features.`}
-          </p>
-          <button
-            onClick={onUpgrade}
-            className="inline-flex items-center gap-1 mt-2 text-sm font-medium text-amber-800 hover:text-amber-900 transition-colors"
-          >
-            Upgrade to Pro
-            <ArrowRight className="h-3 w-3" />
-          </button>
-        </div>
+    <div className="upgrade-prompt" style={{ border: '1px solid var(--border)', borderRadius: 12, padding: 12, marginBottom: 12 }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+        <Crown aria-hidden className="h-4 w-4" />
+        <strong style={{ fontSize: 14 }}>{feature} requires Pro</strong>
       </div>
+      <p className="muted" style={{ marginTop: 6 }}>
+        {description || `Upgrade to Pro to unlock ${feature.toLowerCase()} and more premium features.`}
+      </p>
+      <button onClick={onUpgrade} className="btn" style={{ marginTop: 8, display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+        Upgrade to Pro
+        <ArrowRight aria-hidden className="h-3 w-3" />
+      </button>
     </div>
   )
 }

@@ -3,6 +3,16 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="Content-Security-Policy" content="
+      default-src 'self';
+      script-src 'self';
+      connect-src 'self';
+      frame-src 'self' https://github.com;
+      img-src 'self' data: https://github.com https://github.githubassets.com https://avatars.githubusercontent.com;
+      style-src 'self' 'unsafe-inline';
+      base-uri 'self';
+      form-action 'self';
+    "/>
     <title>TaxSmart · Canada Sales-Tax Calculator</title>
     <meta
       name="description"
@@ -12,7 +22,7 @@
     <meta property="og:title" content="TaxSmart · Canada Sales-Tax Calculator" />
     <meta
       property="og:description"
-      content="Estimate GST/HST/PST/QST with per-province overrides, share snapshots, and collaborate on quotes."
+      content="Estimate GST/HST/PST/QST with per-province overrides, share snapshots, and compare personal scenarios."
     />
     <meta property="og:url" content="https://taxapp.thesolutiondesk.ca/" />
     <meta name="theme-color" content="#050914" media="(prefers-color-scheme: dark)" />
@@ -28,7 +38,8 @@
         display: flex;
         flex-direction: column;
       }
-      .loading, .error {
+      .loading,
+      .error {
         flex: 1;
         display: flex;
         justify-content: center;
@@ -41,8 +52,8 @@
         color: #ff4d4f;
       }
     </style>
-    <script type="module" crossorigin src="/assets/index-B-kXtZcy.js"></script>
-    <link rel="stylesheet" crossorigin href="/assets/index-gnD76FeW.css">
+    <script type="module" crossorigin src="/assets/index-BuYYSSRf.js"></script>
+    <link rel="stylesheet" crossorigin href="/assets/index-CU6tOIYw.css">
   </head>
   <body>
     <div id="root">

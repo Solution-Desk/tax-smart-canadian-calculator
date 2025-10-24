@@ -1,42 +1,24 @@
 name: Feature request
-about: Suggest an idea to improve Canada Tax Smart Calc.
+description: Suggest an idea or improvement.
 labels: [enhancement]
-assignees: []
-
-title: "[Feature]: "
 body:
-  - type: markdown
-    attributes:
-      value: |
-        Thanks for helping us make the calculator better!
   - type: textarea
     id: problem
     attributes:
-      label: Problem to solve
-      description: Describe the user problem or workflow friction this feature would address.
-      placeholder: When quoting for...
-    validations:
-      required: true
+      label: Problem
+      description: What are you trying to do or solve?
+      placeholder: "As a user, I want..."
+      render: markdown
+    validations: { required: true }
   - type: textarea
     id: proposal
     attributes:
       label: Proposed solution
-      description: Share the behaviour, UI, or logic you would like to see.
-      placeholder: Add a toggle that...
-    validations:
-      required: true
-  - type: textarea
-    id: alternatives
+  - type: checkboxes
+    id: scope
     attributes:
-      label: Alternatives considered
-      description: Have you tried other approaches or workarounds?
-  - type: textarea
-    id: references
-    attributes:
-      label: References & links
-      description: Include CRA/provincial citations, screenshots, or related issues/PRs.
-  - type: textarea
-    id: extra
-    attributes:
-      label: Additional context
-      description: Anything else maintainers should know?
+      label: Scope
+      options:
+        - label: Affects UI
+        - label: Affects rates/data
+        - label: Affects sharing/URLs

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="512" height="512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="g" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#7c3aed"/>
+      <stop offset="100%" stop-color="#a78bfa"/>
+    </linearGradient>
+  </defs>
+  <rect width="512" height="512" rx="96" fill="url(#g)"/>
+  <g transform="translate(256,260)">
+    <path d="M-16-120l16 56 16-56 24 48 32-40-8 56 48-16-32 40 56 16-56 16 40 32-56-8 16 48-40-32-16 56-16-56-40 32 16-48-56 8 40-32-56-16 56-16-32-40 48 16-8-56 32 40z" fill="#fff"/>
+  </g>
+  <g transform="translate(256,410)" font-family="Inter, system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, Helvetica Neue, Arial, sans-serif" font-size="84" font-weight="700" text-anchor="middle" fill="#ffffff">
+    <text>CA</text>
+  </g>
+</svg>

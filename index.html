@@ -3,16 +3,40 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="Content-Security-Policy" content="
+      default-src 'self';
+      script-src 'self' https://pagead2.googlesyndication.com;
+      connect-src 'self' ws: wss: https://*.googlesyndication.com https://*.doubleclick.net https://*.g.doubleclick.net https://*.google.com;
+      frame-src 'self' https://github.com https://*.googlesyndication.com https://*.doubleclick.net https://*.g.doubleclick.net;
+      img-src 'self' data: https://github.com https://github.githubassets.com https://avatars.githubusercontent.com https://*.googlesyndication.com https://*.doubleclick.net https://*.g.doubleclick.net;
+      style-src 'self' 'unsafe-inline';
+      worker-src 'self';
+      manifest-src 'self';
+      base-uri 'self';
+      form-action 'self';
+    "/>
     <title>TaxSmart · Canada Sales-Tax Calculator</title>
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta
       name="description"
       content="Free, shareable Canada sales-tax calculator with GST, HST, PST, and QST plus province-specific category rules."
     />
+    <meta property="og:image" content="/icon.svg" />
+
+    <!-- AdSense site verification: static head script so Google can detect it -->
+    <!-- Uses Vite env placeholder; set VITE_ADSENSE_CLIENT_ID in CI or .env -->
+    <script
+      data-adsbygoogle-script="true"
+      async
+      src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=%VITE_ADSENSE_CLIENT_ID%"
+      crossorigin="anonymous"
+    ></script>
     <meta property="og:type" content="website" />
     <meta property="og:title" content="TaxSmart · Canada Sales-Tax Calculator" />
     <meta
       property="og:description"
-      content="Estimate GST/HST/PST/QST with per-province overrides, share snapshots, and collaborate on quotes."
+      content="Estimate GST/HST/PST/QST with per-province overrides, share snapshots, and compare personal scenarios."
     />
     <meta property="og:url" content="https://taxapp.thesolutiondesk.ca/" />
     <meta name="theme-color" content="#050914" media="(prefers-color-scheme: dark)" />
@@ -28,7 +52,8 @@
         display: flex;
         flex-direction: column;
       }
-      .loading, .error {
+      .loading,
+      .error {
         flex: 1;
         display: flex;
         justify-content: center;

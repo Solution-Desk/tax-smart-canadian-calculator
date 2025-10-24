@@ -1,2 +1,4 @@
-# Primary maintainers for review routing
-* @solutionsrme
+# Require reviews from you on critical paths
+*                    @SolutionsRMe
+/docs/**             @SolutionsRMe
+/src/**              @SolutionsRMe

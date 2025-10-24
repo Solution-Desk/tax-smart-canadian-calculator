@@ -1,165 +1,160 @@
-# Canada Tax Smart Calc
+<div align="center">
 
-Free, shareable Canada sales-tax calculator (GST/HST/PST/QST) with province-specific rules.  
-**Essentials stay free forever** (kids, food, hygiene) — extras & workflow features are Pro.
+# TaxSmart — Canadian Sales-Tax Calculator
 
----
+**GST • HST • PST • QST — fast, accurate totals with shareable scenarios**
 
-## Live URL (custom domain)
+[![Website](https://img.shields.io/badge/Live%20App-taxapp.thesolutiondesk.ca-2b6cb0?labelColor=0b1020\&logo=globe\&logoColor=white)](https://taxapp.thesolutiondesk.ca/)
+![Built with](https://img.shields.io/badge/Vite-React%20%2B%20TypeScript-5e5eff?labelColor=0b1020\&logo=vite\&logoColor=white)
+![License](https://img.shields.io/badge/License-MIT-10b981?labelColor=0b1020)
 
-Recommended: host at **https://taxapp.thesolutiondesk.ca** (subdomain of your site).
+</div>
 
-If you prefer GitHub's default domain instead:  
-`https://solutionsrme.github.io/canada-tax-smart-calc/` (see **Deploy → Option B**).
-
----
-
-## Product overview
-
-### Free categories (always available)
-- Standard
-- Zero-rated (basic groceries)
-- Children's clothing & footwear
-- Children's diapers
-- Children's car seats & booster seats
-- Feminine hygiene products
-- Prescription drugs / medical
-- Public transit fares
-- Printed books (qualifying) & Newspapers (qualifying)
-- Exempt / GST only / Provincial only (overrides)
-
-### Premium (gated) categories
-- Prepared food / restaurant
-- Snack foods / candy
-- Sweetened carbonated beverages
-- Cannabis (non-medical)
-- Tobacco / alcohol
-
-### Free features
-- Unlimited calculations (no account)
-- Share link (encodes line items)
-- Copy totals
-- One local preset (browser)
-- Dark mode
-- Transparent **References** list
-
-### Pro features (suggested)
-- PDF & CSV export
-- Unlimited presets & per-client projects
-- Batch import (CSV)
-- Multi-currency display
-- "Audit footnotes" (which rule triggered)
-
-> **Scope:** This app models GST/HST/PST/QST at checkout. Excise duties/markups (alcohol, tobacco, cannabis) and deposits/levies are **not** included.
+<p align="center">
+  <img src="./assets/app-image.jpg" alt="TaxSmart app showing province selector, line items, and GST/HST/PST/QST breakdown" width="820">
+</p>
 
 ---
 
-## Pricing (recommended)
+## Overview
 
-- **Pro: CAD $14.99/year** (headline) or **$2.49/month**
-- Optional **Supporter: CAD $19.99/year** (same features; helps fund free access)
-- Essentials remain free for everyone
+**TaxSmart** is a privacy-first calculator for Canadian sales taxes across provinces and territories.
+It’s built for shoppers, freelancers, and small businesses who need clear line-item math and **shareable scenarios**—without accounts or tracking.
 
-You can adjust these copy/values in the paywall later.
+* **Province/territory-aware rates:** GST / HST / PST / QST
+* **Line items:** price × quantity with automatic tax breakdown
+* **Clear totals:** `subtotal → taxes → total`
+* **Shareable:** copy the page URL to share a scenario
+* **Responsive & keyboard-friendly** (works great on mobile and desktop)
+* **No sign-in required** for the core calculator
 
----
-
-## Tech stack
-
-- Vite + React (TypeScript)
-- Lightweight CSS (`src/index.css`)
-- Pure static build → GitHub Pages (or any static host)
+> **Live app:** [https://taxapp.thesolutiondesk.ca/](https://taxapp.thesolutiondesk.ca/)
 
 ---
 
-## Local development
+## Quick Start
+
+**Requirements:** Node 20+ and npm.
 
 ```bash
-npm i
+# 1) Install
+npm ci
+
+# 2) Run locally (Vite dev server)
 npm run dev
-```
 
-Open the URL Vite prints (e.g., http://localhost:5173/).
-
-## Build
-
-```bash
+# 3) Production build
 npm run build
+
+# 4) Preview the production build
+npm run preview
 ```
 
-Outputs static files to `dist/`.
+> The dev server prints a localhost URL. Open it to use TaxSmart during development.
 
-## Deploy
+---
 
-### Option A — Custom subdomain (recommended)
+## How to Use
 
-Host at https://taxapp.thesolutiondesk.ca.
+1. Select your **province/territory**.
+2. Add **items** (unit price & quantity).
+3. Review the **tax breakdown and total**.
+4. **Copy the URL** to share the scenario (bookmark frequent scenarios).
 
-**DNS:** add a CNAME record at your DNS provider
-- Name/Host: `taxapp`
-- Target/Value: `solutionsrme.github.io`
-- TTL: default/auto
-- (Cloudflare: set to DNS only / grey cloud)
+---
 
-**Vite base path:** custom domain serves at the root → set base to `/`
+## Tech Stack
 
-```typescript
-// vite.config.ts
-import { defineConfig } from 'vite'
-import react from '@vitejs/plugin-react'
+* **Vite** + **React** + **TypeScript**
+* Lightweight state + utility libs
+* Simple, accessible UI with sensible defaults
 
-export default defineConfig({
-  plugins: [react()],
-  base: '/', // custom domain -> root path
-})
+---
+
+## Project Structure
+
+```
+tax-smart-canadian-calculator/
+├─ public/           # static assets
+├─ assets/           # repo images (README/social)
+├─ src/
+│  ├─ components/    # UI components
+│  ├─ lib/           # tax helpers & utilities
+│  ├─ styles/        # global styles (if applicable)
+│  ├─ App.tsx        # root app
+│  └─ main.tsx       # Vite entry
+├─ index.html
+├─ package.json
+└─ vite.config.ts
 ```
 
-**Permanent CNAME file (recommended):**
-Create `public/CNAME` containing:
-```
-taxapp.thesolutiondesk.ca
-```
+---
 
-Vite will include this in every build so Pages auto-detects the domain.
+## Accessibility
 
-**GitHub Pages settings:**
-- Repo → Settings → Pages → Custom domain: `taxapp.thesolutiondesk.ca`
-- Check "Enforce HTTPS"
+We aim for **WCAG-sensible defaults**:
 
-- Rates/rules are implemented to the best of our knowledge and linked to CRA/provincial references.
-- **Not legal/tax advice.** Validate for your use case and keep rules up to date for your deployment.
+* Labeled controls, descriptive `alt` text, visible focus states
+* Full keyboard navigation for interactive elements
+* Contrast targets near **AA** where feasible
 
-## Testing
+If you hit an accessibility snag, please open an issue with your **browser/OS/assistive-tech** details.
 
-We're building out a Vitest suite with golden cases per province and category. Contributions welcome — see Contributing.
+---
+
+## Privacy & Accuracy
+
+* **Privacy:** the core calculator doesn’t require accounts or collect personal data.
+* **Accuracy:** rates are maintained with best efforts, but tax outcomes vary by context.
+* **Disclaimer:** This tool is informational only and **not** tax or financial advice.
+  For authoritative guidance, verify with the **CRA** and your province/territory tax authority.
+
+---
+
+## Troubleshooting
+
+* **Blank page after deploy**
+  Ensure built files are served from the correct base path
+  (Vite’s `base` option must match your hosting subpath, if any).
+
+* **Styles not applying**
+  Confirm CSS is present in `dist/` and referenced by `index.html`.
+
+* **Module not found**
+  Run `npm ci` to install a clean dependency set.
+
+---
 
 ## Roadmap
 
-- **Pro:** multi‑province comparison, CSV/PDF export, saved templates, private share links
-- **Pro:** per‑user workspaces and entitlement checks  
-- **Data:** effective‑date ranges for rules + changelog PR bot
-- **Accessibility:** keyboard table navigation and WCAG 2.1 AA audits
+* CSV import/export
+* Saved scenarios (local-first)
+* Small-business presets
+* In-app links to official rate sources
+* Print-friendly layout
+
+Have an idea? Open an **Issue** or start a **Discussion**.
+
+---
 
 ## Contributing
 
-PRs are welcome.
+Contributions are welcome!
 
-- Keep business logic in `src/lib`, UI in `src/components`, shared concerns as hooks.
-- Include links to CRA/provincial sources when changing tax rules.
-- Run `npm run build` before opening a PR and fill in the PR template.
-- Be kind — we follow the Code of Conduct.
+1. Fork the repo & create a feature branch.
+2. Make focused changes with clear commit messages.
+3. If you change **tax logic or rates**, update `CHANGELOG.md` and link sources.
+4. Open a PR describing what changed and why (screenshots welcome).
 
-See: [`CONTRIBUTING.md`](CONTRIBUTING.md), [`CODE_OF_CONDUCT.md`](CODE_OF_CONDUCT.md).
+Please review:
 
-## Security & privacy
+* [`CODE_OF_CONDUCT.md`](./CODE_OF_CONDUCT.md)
+* [`CONTRIBUTING.md`](./CONTRIBUTING.md)
+* [`SECURITY.md`](./SECURITY.md)
+* [`SUPPORT.md`](./SUPPORT.md)
 
-- **Static SPA:** no server, no accounts, no telemetry by default
-- If you discover a vulnerability, please follow [`SECURITY.md`](SECURITY.md) for responsible disclosure
+---
 
 ## License
 
-MIT — see [`LICENSE`](LICENSE).
-
-## Acknowledgements
-
-Thanks to Canadian merchants, accountants, and developers who contributed test cases and references. ❤️
+MIT © The Solution Desk

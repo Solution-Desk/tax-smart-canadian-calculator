@@ -1,57 +1,35 @@
 name: Bug report
-about: Help us squash bugs by sharing reproduction steps and context.
+description: Something not working as expected? Tell us.
 labels: [bug]
-assignees: []
-
-title: "[Bug]: "
 body:
-  - type: markdown
-    attributes:
-      value: |
-        Thanks for taking the time to tell us about a problem.
   - type: textarea
-    id: summary
+    id: what-happened
     attributes:
-      label: Summary
-      description: What went wrong? Give a quick overview.
-      placeholder: The calculator crashed when...
-    validations:
-      required: true
-  - type: textarea
-    id: reproduction
-    attributes:
-      label: Steps to reproduce
-      description: Share the steps that triggered the bug. Include sample input amounts if relevant.
-      placeholder: |
-        1. Go to province...
-        2. Add line item category...
-        3. Click...
-    validations:
-      required: true
-  - type: textarea
-    id: expected
-    attributes:
-      label: Expected behaviour
-      description: What did you expect to happen instead?
-    validations:
-      required: true
-  - type: textarea
-    id: screenshots
-    attributes:
-      label: Screenshots or recordings
-      description: Drag & drop images, GIFs, or short videos that show the issue.
+      label: What happened?
+      description: What did you expect to happen?
+      placeholder: Clear steps, actual vs. expected.
+    validations: { required: true }
   - type: input
-    id: version
+    id: url
     attributes:
-      label: App version / commit
-      description: Link to the commit, release tag, or describe the deployment environment.
+      label: Scenario link (if any)
+      placeholder: https://taxapp.thesolutiondesk.ca/?p=BC&items=...
+  - type: dropdown
+    id: province
+    attributes:
+      label: Province / Territory
+      options: [AB, BC, MB, NB, NL, NS, NT, NU, ON, PE, QC, SK, YT]
+  - type: input
+    id: ua
+    attributes:
+      label: Browser + OS
+      placeholder: "Chrome 140 on Windows 10"
   - type: textarea
-    id: environment
+    id: repro
     attributes:
-      label: Environment
-      description: Browser, OS, device, screen size, etc.
+      label: Reproduction steps
+      description: Step-by-step so we can reproduce.
   - type: textarea
-    id: extra
+    id: logs
     attributes:
-      label: Additional context
-      description: Anything else we should know?
+      label: Console logs / screenshots

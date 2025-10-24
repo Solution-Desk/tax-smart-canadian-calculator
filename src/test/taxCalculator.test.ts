@@ -8,84 +8,84 @@ describe('Tax Calculator', () => {
       const item: LineItemInput = { amount: 100, category: 'Standard' }
       const result = calculateLine(item, 'AB')
       
-      expect(result.amount).toBe(100)
-      expect(result.federalTax).toBe(5) // 5% GST
+      expect(result.amount).toBeCloseTo(100, 10)
+      expect(result.federalTax).toBeCloseTo(5, 10) // 5% GST
       expect(result.provincialTax).toBe(0)
       expect(result.hstTax).toBe(0)
-      expect(result.totalTax).toBe(5)
-      expect(result.grandTotal).toBe(105)
+      expect(result.totalTax).toBeCloseTo(5, 10)
+      expect(result.grandTotal).toBeCloseTo(105, 10)
     })
 
     it('should calculate HST for Ontario standard items', () => {
       const item: LineItemInput = { amount: 100, category: 'Standard' }
       const result = calculateLine(item, 'ON')
       
-      expect(result.amount).toBe(100)
+      expect(result.amount).toBeCloseTo(100, 10)
       expect(result.federalTax).toBe(0)
       expect(result.provincialTax).toBe(0)
-      expect(result.hstTax).toBe(13) // 13% HST
-      expect(result.totalTax).toBe(13)
-      expect(result.grandTotal).toBe(113)
+      expect(result.hstTax).toBeCloseTo(13, 10) // 13% HST
+      expect(result.totalTax).toBeCloseTo(13, 10)
+      expect(result.grandTotal).toBeCloseTo(113, 10)
     })
 
     it('should calculate GST+PST for BC standard items', () => {
       const item: LineItemInput = { amount: 100, category: 'Standard' }
       const result = calculateLine(item, 'BC')
       
-      expect(result.amount).toBe(100)
-      expect(result.federalTax).toBe(5) // 5% GST
-      expect(result.provincialTax).toBe(7) // 7% PST
+      expect(result.amount).toBeCloseTo(100, 10)
+      expect(result.federalTax).toBeCloseTo(5, 10) // 5% GST
+      expect(result.provincialTax).toBeCloseTo(7, 10) // 7% PST
       expect(result.hstTax).toBe(0)
-      expect(result.totalTax).toBe(12)
-      expect(result.grandTotal).toBe(112)
+      expect(result.totalTax).toBeCloseTo(12, 10)
+      expect(result.grandTotal).toBeCloseTo(112, 10)
     })
 
     it('should handle exempt items correctly', () => {
       const item: LineItemInput = { amount: 100, category: 'Exempt' }
       const result = calculateLine(item, 'ON')
       
-      expect(result.amount).toBe(100)
+      expect(result.amount).toBeCloseTo(100, 10)
       expect(result.federalTax).toBe(0)
       expect(result.provincialTax).toBe(0)
       expect(result.hstTax).toBe(0)
       expect(result.totalTax).toBe(0)
-      expect(result.grandTotal).toBe(100)
+      expect(result.grandTotal).toBeCloseTo(100, 10)
     })
 
     it('should handle zero-rated basic groceries', () => {
       const item: LineItemInput = { amount: 100, category: 'Zero-rated (basic groceries)' }
       const result = calculateLine(item, 'BC')
       
-      expect(result.amount).toBe(100)
+      expect(result.amount).toBeCloseTo(100, 10)
       expect(result.federalTax).toBe(0)
       expect(result.provincialTax).toBe(0)
       expect(result.hstTax).toBe(0)
       expect(result.totalTax).toBe(0)
-      expect(result.grandTotal).toBe(100)
+      expect(result.grandTotal).toBeCloseTo(100, 10)
     })
 
     it('should apply children\'s clothing exemption in Ontario', () => {
       const item: LineItemInput = { amount: 100, category: "Children's clothing & footwear" }
       const result = calculateLine(item, 'ON')
       
-      expect(result.amount).toBe(100)
-      expect(result.federalTax).toBe(5) // GST only, no provincial
+      expect(result.amount).toBeCloseTo(100, 10)
+      expect(result.federalTax).toBeCloseTo(5, 10) // GST only, no provincial
       expect(result.provincialTax).toBe(0)
       expect(result.hstTax).toBe(0)
-      expect(result.totalTax).toBe(5)
-      expect(result.grandTotal).toBe(105)
+      expect(result.totalTax).toBeCloseTo(5, 10)
+      expect(result.grandTotal).toBeCloseTo(105, 10)
     })
 
     it('should handle restaurant meals under $4 in Ontario', () => {
       const item: LineItemInput = { amount: 3.50, category: 'Prepared food / restaurant' }
       const result = calculateLine(item, 'ON')
       
-      expect(result.amount).toBe(3.50)
-      expect(result.federalTax).toBe(0.175) // GST only
+      expect(result.amount).toBeCloseTo(3.50, 2)
+      expect(result.federalTax).toBeCloseTo(0.175, 3) // GST only
       expect(result.provincialTax).toBe(0)
       expect(result.hstTax).toBe(0)
-      expect(result.totalTax).toBe(0.175)
-      expect(result.grandTotal).toBe(3.675)
+      expect(result.totalTax).toBeCloseTo(0.175, 3)
+      expect(result.grandTotal).toBeCloseTo(3.675, 3)
     })
 
     it('should handle negative amounts by treating them as zero', () => {
@@ -117,12 +117,12 @@ describe('Tax Calculator', () => {
       
       const result = aggregate(lines)
       
-      expect(result.subTotal).toBe(175)
-      expect(result.federal).toBe(7.5)
-      expect(result.provincial).toBe(10.5)
+      expect(result.subTotal).toBeCloseTo(175, 10)
+      expect(result.federal).toBeCloseTo(7.5, 10)
+      expect(result.provincial).toBeCloseTo(10.5, 10)
       expect(result.hst).toBe(0)
-      expect(result.tax).toBe(18)
-      expect(result.grandTotal).toBe(193)
+      expect(result.tax).toBeCloseTo(18, 10)
+      expect(result.grandTotal).toBeCloseTo(193, 10)
     })
 
     it('should handle empty array', () => {
@@ -151,9 +151,9 @@ describe('Tax Calculator', () => {
       expect(result.totals.subTotal).toBe(175)
       // Standard: 5 GST + 7 PST = 12
       // Groceries: 0
-      // Children's clothing in BC: 5 GST + 0 PST = 5 (PST exempt)
-      expect(result.totals.tax).toBe(17)
-      expect(result.totals.grandTotal).toBe(192)
+      // Children's clothing in BC: 5% GST only (PST exempt) = 1.25
+      expect(result.totals.tax).toBeCloseTo(13.25, 2)
+      expect(result.totals.grandTotal).toBeCloseTo(188.25, 2)
     })
 
     it('should handle Quebec QST calculation', () => {

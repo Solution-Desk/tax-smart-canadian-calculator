@@ -5,11 +5,13 @@ export type CategoryFlags = { federal: boolean; provincial: boolean }
 function getBaseFlags(category: Category): CategoryFlags {
   switch (category) {
     case 'Exempt':
-    case 'Zero-rated (basic groceries)':
     case 'Feminine hygiene products':
     case 'Public transit fares':
     case 'Prescription drugs / medical':
       return { federal: false, provincial: false }
+    case 'Zero-rated (basic groceries)':
+      // Basic groceries are zero-rated for GST but may be subject to PST in some provinces
+      return { federal: false, provincial: true }
     case 'Printed books (qualifying)':
     case 'Newspapers (qualifying)':
       return { federal: true, provincial: true }
@@ -54,6 +56,32 @@ function applyProvinceOverrides(
     }
     case 'Sweetened carbonated beverages': {
       if (['BC', 'MB', 'SK'].includes(province)) provincial = true
+      break
+    }
+    case 'Zero-rated (basic groceries)': {
+      // Basic groceries are zero-rated for GST in all provinces
+      federal = false
+      
+      // Provincial tax rules for groceries
+      if (['AB', 'NT', 'NU', 'YT'].includes(province)) {
+        // No PST in these territories
+        provincial = false
+      } else if (province === 'BC') {
+        // BC: No PST on basic groceries
+        provincial = false
+      } else if (province === 'SK') {
+        // SK: 6% PST on groceries
+        provincial = true
+      } else if (province === 'MB') {
+        // MB: 7% PST on groceries
+        provincial = true
+      } else if (province === 'QC') {
+        // QC: 9.975% QST on groceries
+        provincial = true
+      } else if (['ON', 'NB', 'NL', 'NS', 'PE'].includes(province)) {
+        // HST provinces: No additional PST on basic groceries (already included in HST which is 0% for groceries)
+        provincial = false
+      }
       break
     }
     case 'Snack foods / candy': {
