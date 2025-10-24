@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Redirecting...</title>
+  <script>
+    // Get the path from the URL and redirect to index.html with the path as a query parameter
+    const path = window.location.pathname;
+    const search = window.location.search;
+    const hash = window.location.hash;
+    
+    // If this is a direct file request (like /assets/...), don't redirect
+    if (!path.includes('.')) {
+      // Redirect to index.html with the path as a query parameter
+      window.location.href = `/?redirect=${encodeURIComponent(path + search + hash)}`;
+    }
+  </script>
+  <noscript>
+    <meta http-equiv="refresh" content="0; url=/?redirect=/">
+  </noscript>
+</head>
+<body>
+  <p>Redirecting... If you're not redirected, <a href="/">click here</a>.</p>
+</body>
+</html>

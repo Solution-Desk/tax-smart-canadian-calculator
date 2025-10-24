@@ -8,8 +8,11 @@ export default defineConfig(({ mode }) => {
   // Load env file based on `mode` in the current working directory.
   const env = loadEnv(mode, process.cwd(), '');
   
-  // For GitHub Pages on a custom domain, base should be '/'
-  const base = env.VITE_BASE_URL || '/';
+  // For GitHub Pages, use the repository name as the base path
+  const isProduction = process.env.NODE_ENV === 'production';
+  const base = process.env.GITHUB_PAGES === 'true' 
+    ? '/tax-smart-canadian-calculator/'
+    : env.VITE_BASE_URL || '/';
   
   return {
     plugins: [
@@ -17,7 +20,6 @@ export default defineConfig(({ mode }) => {
       VitePWA({
         registerType: 'autoUpdate',
         injectRegister: 'auto',
-        strategies: 'generateSW',
         manifest: {
           name: 'TaxSmart · Canada Sales-Tax Calculator',
           short_name: 'TaxSmart',
@@ -34,20 +36,14 @@ export default defineConfig(({ mode }) => {
               src: '/icon.svg',
               sizes: 'any',
               type: 'image/svg+xml',
-              purpose: 'any maskable'
+              purpose: 'any'
             }
           ],
         },
         workbox: {
           globPatterns: ['**/*.{js,css,html,ico,png,svg}'],
-          navigateFallback: '/index.html',
-          cleanupOutdatedCaches: true,
-          clientsClaim: true,
-          skipWaiting: true,
+          navigateFallback: base.endsWith('/') ? `${base}index.html` : `${base}/index.html`,
         },
-        devOptions: {
-          enabled: false
-        }
       })
     ],
     base,

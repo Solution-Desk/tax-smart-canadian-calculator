@@ -97,3 +97,4 @@ temp/
 
 # Production environment variables
 .env.production
+node_modules
