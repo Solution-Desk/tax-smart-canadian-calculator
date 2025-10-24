@@ -10,9 +10,19 @@ export default defineConfig(({ mode }) => {
   
   // For GitHub Pages, use the repository name as the base path
   const isProduction = process.env.NODE_ENV === 'production';
-  const base = process.env.GITHUB_PAGES === 'true' 
-    ? '/tax-smart-canadian-calculator/'
-    : env.VITE_BASE_URL || '/';
+  let base = '/';
+  
+  // In production, use the repository name as base path for GitHub Pages
+  if (isProduction) {
+    // Check if we're running in a GitHub Pages environment
+    if (process.env.GITHUB_PAGES === 'true') {
+      base = '/tax-smart-canadian-calculator/';
+    }
+    // Allow VITE_BASE_URL to override in case of custom domain
+    if (env.VITE_BASE_URL) {
+      base = env.VITE_BASE_URL;
+    }
+  }
   
   return {
     plugins: [
