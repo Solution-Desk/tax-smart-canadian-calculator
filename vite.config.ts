@@ -8,16 +8,18 @@ export default defineConfig(({ mode }) => {
   // Load env file based on `mode` in the current working directory.
   const env = loadEnv(mode, process.cwd(), '');
   
-  // For GitHub Pages, use the repository name as the base path
-  const isProduction = process.env.NODE_ENV === 'production';
+  // Determine base URL based on environment
   let base = '/';
   
-  // In production, use the repository name as base path for GitHub Pages
-  if (isProduction) {
-    // For GitHub Pages deployment
-    if (process.env.GITHUB_PAGES === 'true') {
-      // Use root path for custom domain, repo path for GitHub Pages
-      base = process.env.VITE_USE_CUSTOM_DOMAIN === 'true' ? '/' : '/tax-smart-canadian-calculator/';
+  // In production builds
+  if (process.env.NODE_ENV === 'production') {
+    // For GitHub Pages with custom domain or local build
+    if (process.env.VITE_USE_CUSTOM_DOMAIN === 'true' || process.env.GITHUB_PAGES !== 'true') {
+      base = '/';
+    } 
+    // For GitHub Pages without custom domain
+    else {
+      base = '/tax-smart-canadian-calculator/';
     }
   }
   
