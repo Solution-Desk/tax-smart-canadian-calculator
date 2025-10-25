@@ -14,13 +14,10 @@ export default defineConfig(({ mode }) => {
   
   // In production, use the repository name as base path for GitHub Pages
   if (isProduction) {
-    // Check if we're running in a GitHub Pages environment
+    // For GitHub Pages deployment
     if (process.env.GITHUB_PAGES === 'true') {
-      base = '/tax-smart-canadian-calculator/';
-    }
-    // Allow VITE_BASE_URL to override in case of custom domain
-    if (env.VITE_BASE_URL) {
-      base = env.VITE_BASE_URL;
+      // Use root path for custom domain, repo path for GitHub Pages
+      base = process.env.VITE_USE_CUSTOM_DOMAIN === 'true' ? '/' : '/tax-smart-canadian-calculator/';
     }
   }
   

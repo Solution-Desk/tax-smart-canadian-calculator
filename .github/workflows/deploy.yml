@@ -27,7 +27,7 @@ jobs:
         run: npm ci
 
       - name: Build
-        run: GITHUB_PAGES=true npm run build
+        run: GITHUB_PAGES=true VITE_USE_CUSTOM_DOMAIN=true npm run build
 
       - name: Setup Pages
         uses: actions/configure-pages@v4
