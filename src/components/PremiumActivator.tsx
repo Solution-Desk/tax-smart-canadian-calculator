@@ -1,8 +1,12 @@
-import { useEffect } from 'react'
+import { ReactNode, useEffect } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { usePremium } from '../hooks/usePremium'
 
-export function PremiumActivator() {
+type PremiumActivatorProps = {
+  children: ReactNode;
+};
+
+export function PremiumActivator({ children }: PremiumActivatorProps) {
   const { enable } = usePremium()
   const location = useLocation()
   const navigate = useNavigate()
@@ -18,5 +22,5 @@ export function PremiumActivator() {
     }
   }, [location, navigate, enable])
 
-  return null
+  return <>{children}</>
 }

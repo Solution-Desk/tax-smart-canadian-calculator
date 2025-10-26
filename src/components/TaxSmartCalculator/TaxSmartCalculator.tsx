@@ -15,7 +15,7 @@ import { encodeState, extractStateFromHash } from "../../lib/share"
 import { useDarkMode } from "../../hooks/useDarkMode"
 import { useLocalStorage } from "../../hooks/useAutoCalc"
 import { TAX_PRESETS } from "../../lib/taxPresets"
-import { Sparkles, Info, X } from 'lucide-react'
+import { Sparkles, Info, X, HelpCircle } from 'lucide-react'
 import { Modal } from '../Modal'
 import { CategoryTooltip } from '../ui/Tooltip'
 import "./TaxSmartCalculator.css"
@@ -277,6 +277,7 @@ export default function TaxSmartCalculator() {
   const [isPremiumModalOpen, setPremiumModalOpen] = useState(false)
   const [isReferencesModalOpen, setReferencesModalOpen] = useState(false)
   const [isTaxInfoModalOpen, setTaxInfoModalOpen] = useState(false)
+  const [showProvinceTooltip, setShowProvinceTooltip] = useState(false)
   const emailNoticeTimeoutRef = useRef<number | null>(null)
   const noticeTimeoutRef = useRef<number | null>(null)
 
@@ -508,7 +509,7 @@ export default function TaxSmartCalculator() {
         </div>
       )}
 
-      <main className="calculator-main grid grid-cols-1 md:grid-cols-2 gap-6">
+      <main className="calculator-main grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 px-2 sm:px-4">
         <section className="panel">
           <div className="panel-header">
             <h1 className="panel-title">Canada sales-tax smart calculator</h1>
@@ -518,16 +519,38 @@ export default function TaxSmartCalculator() {
             Estimate combined GST, HST, PST, and QST with per-province category rules.
           </p>
 
-          <div className="province-grid">
+          <div className="space-y-4">
             <article className="total-card form-field-card" aria-labelledby="province-select-label">
-              <label id="province-select-label" className="field-label" htmlFor="province-select">
-                Province / Territory
-              </label>
+              <div className="flex items-center justify-between">
+                <label id="province-select-label" className="field-label" htmlFor="province-select">
+                  Province / Territory
+                </label>
+                <button 
+                  type="button" 
+                  className="p-2 -mr-2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+                  onClick={() => setShowProvinceTooltip(!showProvinceTooltip)}
+                  aria-label="Learn more about province selection"
+                  aria-expanded={showProvinceTooltip}
+                >
+                  <HelpCircle size={16} />
+                </button>
+              </div>
+              {showProvinceTooltip && (
+                <div id="province-tooltip" className="tooltip-content">
+                  <p>Select your province or territory to see the correct tax rates. Tax rates vary by province and can include GST, HST, or PST.</p>
+                  <p className="mt-2 text-sm">
+                    <strong>GST:</strong> 5% federal tax (applies nationwide)<br />
+                    <strong>HST:</strong> Combined federal/provincial tax (varies by province)<br />
+                    <strong>PST:</strong> Provincial sales tax (applies in some provinces)
+                  </p>
+                </div>
+              )}
               <select
                 id="province-select"
-                className="input select"
+                className="input select mt-2"
                 value={province}
                 onChange={(event) => setProvince(event.target.value as Province)}
+                aria-describedby={showProvinceTooltip ? "province-tooltip" : undefined}
               >
                 {PROVINCES.map((code) => (
                   <option key={code} value={code}>
@@ -536,14 +559,30 @@ export default function TaxSmartCalculator() {
                 ))}
               </select>
             </article>
-            <div className="rate-cards">
-              <div className="rate-card">
-                <p className="muted">Federal (GST)</p>
-                <p className="rate-value">{formatPercent(TAX_RATES[province].gst)}</p>
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-3 sm:gap-4">
+              <div className="rate-card p-3 sm:p-4">
+                <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400">Federal (GST)</p>
+                <p className="text-xl sm:text-2xl font-semibold text-gray-900 dark:text-white">{formatPercent(TAX_RATES[province].gst)}</p>
               </div>
-              <div className="rate-card">
-                <p className="muted">Provincial ({provincialLabel})</p>
-                <p className="rate-value">{provincialRate ? formatPercent(provincialRate) : '—'}</p>
+              <div className="rate-card p-3 sm:p-4">
+                <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400">Provincial ({provincialLabel})</p>
+                <p className="text-xl sm:text-2xl font-semibold text-gray-900 dark:text-white">{provincialRate ? formatPercent(provincialRate) : '—'}</p>
+              </div>
+              <div className="rate-card total-rate-card p-3 sm:p-4 col-span-2 md:col-span-1">
+                <p className="text-sm sm:text-base font-medium text-white/90">Total Tax Rate</p>
+                <p className="rate-value">
+                  {provincialRate 
+                    ? formatPercent(TAX_RATES[province].gst + provincialRate)
+                    : formatPercent(TAX_RATES[province].gst)
+                  }
+                </p>
+                {provincialRate && (
+                  <div className="text-xs text-white/90 mt-1">
+                    <span className="block">
+                      {formatPercent(TAX_RATES[province].gst)} GST + {formatPercent(provincialRate)} {provincialLabel}
+                    </span>
+                  </div>
+                )}
               </div>
             </div>
           </div>

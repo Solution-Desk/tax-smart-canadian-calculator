@@ -3,6 +3,7 @@ import React from 'react';
 type Props = {
   children: React.ReactNode;
   fallback?: React.ReactNode;
+  onError?: (error: Error) => void;
 };
 
 type State = {
@@ -22,9 +23,15 @@ export default class ErrorBoundary extends React.Component<Props, State> {
 
   componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
     console.error('ErrorBoundary caught an error:', error, errorInfo);
+    
+    // Call onError callback if provided
+    if (this.props.onError) {
+      this.props.onError(error);
+    }
+    
     // Log to error tracking service if available
-    if (window.gtag) {
-      window.gtag('event', 'exception', {
+    if (typeof window !== 'undefined' && (window as any).gtag) {
+      (window as any).gtag('event', 'exception', {
         description: error.toString(),
         fatal: true,
       });

@@ -2,6 +2,7 @@ import { defineConfig, loadEnv } from 'vite';
 import react from '@vitejs/plugin-react';
 import { VitePWA } from 'vite-plugin-pwa';
 import { resolve } from 'path';
+import { visualizer } from 'rollup-plugin-visualizer';
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => {
@@ -26,15 +27,21 @@ export default defineConfig(({ mode }) => {
   return {
     plugins: [
       react(),
+      mode === 'analyze' && visualizer({
+        open: true,
+        filename: 'dist/stats.html',
+        gzipSize: true,
+        brotliSize: true,
+      }),
       VitePWA({
         registerType: 'autoUpdate',
-        injectRegister: 'auto',
+        includeAssets: ['favicon.svg', 'og-card.png', 'robots.txt', 'sitemap.xml', 'icon-192.png', 'icon-512.png'],
         manifest: {
           name: 'TaxSmart · Canada Sales-Tax Calculator',
           short_name: 'TaxSmart',
-          description: 'GST / HST / PST & QST in one view, with per-province category rules.',
-          theme_color: '#f5f7fb',
-          background_color: '#f5f7fb',
+          description: 'Fast, accurate GST/HST/PST/QST calculator with receipt mode',
+          theme_color: '#0ea5e9',
+          background_color: '#ffffff',
           display: 'standalone',
           start_url: base,
           scope: base,
@@ -42,10 +49,16 @@ export default defineConfig(({ mode }) => {
           categories: ['utilities', 'finance', 'shopping'],
           icons: [
             {
-              src: '/icon.svg',
-              sizes: 'any',
-              type: 'image/svg+xml',
-              purpose: 'any'
+              src: '/icon-192.png',
+              sizes: '192x192',
+              type: 'image/png',
+              purpose: 'any maskable'
+            },
+            {
+              src: '/icon-512.png',
+              sizes: '512x512',
+              type: 'image/png',
+              purpose: 'any maskable'
             }
           ],
         },
@@ -67,12 +80,38 @@ export default defineConfig(({ mode }) => {
         ...env,
       }
     },
+    build: {
+      minify: 'esbuild',
+      sourcemap: false,
+      rollupOptions: {
+        output: {
+          manualChunks: {
+            'react-vendor': ['react', 'react-dom', 'react-router-dom'],
+            'ui': ['lucide-react'],
+            'state': ['zustand']
+          }
+        }
+      },
+      target: 'esnext',
+      chunkSizeWarningLimit: 1000,
+      reportCompressedSize: false,
+      outDir: 'dist',
+      assetsDir: 'assets',
+      emptyOutDir: true,
+    },
     resolve: {
       alias: {
         '@': resolve(__dirname, './src'),
       },
     },
     server: {
+      headers: {
+        'Content-Security-Policy': "default-src 'self'; img-src 'self' data: https:; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com",
+        'X-Content-Type-Options': 'nosniff',
+        'Referrer-Policy': 'strict-origin-when-cross-origin',
+        'X-Frame-Options': 'DENY',
+        'X-XSS-Protection': '1; mode=block'
+      },
       port: 5173,
       open: true,
       proxy: {
