@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en-CA">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Static Tax Calculator - TaxSmart</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      line-height: 1.6;
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 2rem;
+      color: #1f2937;
+    }
+    h1 { color: #0ea5e9; }
+    .calculator {
+      background: #f9fafb;
+      border-radius: 0.5rem;
+      padding: 1.5rem;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+    .form-group {
+      margin-bottom: 1rem;
+    }
+    label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: 500;
+    }
+    input, select, output {
+      width: 100%;
+      padding: 0.5rem;
+      border: 1px solid #d1d5db;
+      border-radius: 0.375rem;
+      font-size: 1rem;
+    }
+    output {
+      display: block;
+      background: white;
+      min-height: 2.5rem;
+      padding: 0.5rem;
+      margin-top: 0.5rem;
+      border: 1px solid #d1d5db;
+      border-radius: 0.375rem;
+    }
+    .result {
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: #0ea5e9;
+    }
+    .back-link {
+      display: inline-block;
+      margin-top: 1.5rem;
+      color: #0ea5e9;
+      text-decoration: none;
+    }
+    .back-link:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+  <h1>Static Tax Calculator</h1>
+  <p>This is a simplified version that works without JavaScript. For the full experience, please enable JavaScript.</p>
+  
+  <div class="calculator">
+    <form oninput="calculate()">
+      <div class="form-group">
+        <label for="province">Province/Territory</label>
+        <select id="province" onchange="calculate()">
+          <option value="AB">Alberta</option>
+          <option value="BC">British Columbia</option>
+          <option value="MB">Manitoba</option>
+          <option value="NB">New Brunswick</option>
+          <option value="NL">Newfoundland and Labrador</option>
+          <option value="NT">Northwest Territories</option>
+          <option value="NS">Nova Scotia</option>
+          <option value="NU">Nunavut</option>
+          <option value="ON" selected>Ontario</option>
+          <option value="PE">Prince Edward Island</option>
+          <option value="QC">Quebec</option>
+          <option value="SK">Saskatchewan</option>
+          <option value="YT">Yukon</option>
+        </select>
+      </div>
+      
+      <div class="form-group">
+        <label for="amount">Amount ($)</label>
+        <input type="number" id="amount" step="0.01" min="0" value="100.00" onchange="calculate()">
+      </div>
+      
+      <div class="form-group">
+        <label>Tax Rate</label>
+        <output id="taxRate">13% (HST)</output>
+      </div>
+      
+      <div class="form-group">
+        <label>Tax Amount</label>
+        <output id="taxAmount" class="result">$13.00</output>
+      </div>
+      
+      <div class="form-group">
+        <label>Total Amount</label>
+        <output id="totalAmount" class="result">$113.00</output>
+      </div>
+    </form>
+  </div>
+  
+  <a href="/" class="back-link">← Back to main calculator</a>
+  
+  <script>
+    const taxRates = {
+      AB: { rate: 0.05, name: 'GST' },
+      BC: { rate: 0.12, name: 'GST + PST' },
+      MB: { rate: 0.12, name: 'GST + PST' },
+      NB: { rate: 0.15, name: 'HST' },
+      NL: { rate: 0.15, name: 'HST' },
+      NT: { rate: 0.05, name: 'GST' },
+      NS: { rate: 0.15, name: 'HST' },
+      NU: { rate: 0.05, name: 'GST' },
+      ON: { rate: 0.13, name: 'HST' },
+      PE: { rate: 0.15, name: 'HST' },
+      QC: { rate: 0.14975, name: 'GST + QST' },
+      SK: { rate: 0.11, name: 'GST + PST' },
+      YT: { rate: 0.05, name: 'GST' }
+    };
+    
+    function calculate() {
+      const province = document.getElementById('province').value;
+      const amount = parseFloat(document.getElementById('amount').value) || 0;
+      const rateInfo = taxRates[province];
+      const tax = amount * rateInfo.rate;
+      const total = amount + tax;
+      
+      document.getElementById('taxRate').textContent = 
+        `${(rateInfo.rate * 100)}% (${rateInfo.name})`;
+      document.getElementById('taxAmount').textContent = 
+        `$${tax.toFixed(2)}`;
+      document.getElementById('totalAmount').textContent = 
+        `$${total.toFixed(2)}`;
+    }
+    
+    // Initial calculation
+    calculate();
+  </script>
+</body>
+</html>

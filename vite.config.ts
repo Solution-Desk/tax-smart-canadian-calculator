@@ -35,32 +35,20 @@ export default defineConfig(({ mode }) => {
       }),
       VitePWA({
         registerType: 'autoUpdate',
-        includeAssets: ['favicon.svg', 'og-card.png', 'robots.txt', 'sitemap.xml', 'icon-192.png', 'icon-512.png'],
+        includeAssets: ['favicon.svg', 'apple-touch-icon.png', 'icons/icon-192.png', 'icons/icon-512.png'],
         manifest: {
-          name: 'TaxSmart · Canada Sales-Tax Calculator',
+          name: 'TaxSmart Canada',
           short_name: 'TaxSmart',
-          description: 'Fast, accurate GST/HST/PST/QST calculator with receipt mode',
-          theme_color: '#0ea5e9',
-          background_color: '#ffffff',
-          display: 'standalone',
+          description: 'Canada GST/HST/PST/QST Calculator',
           start_url: base,
           scope: base,
-          lang: 'en-CA',
-          categories: ['utilities', 'finance', 'shopping'],
+          display: 'standalone',
+          background_color: '#ffffff',
+          theme_color: '#0ea5e9',
           icons: [
-            {
-              src: '/icon-192.png',
-              sizes: '192x192',
-              type: 'image/png',
-              purpose: 'any maskable'
-            },
-            {
-              src: '/icon-512.png',
-              sizes: '512x512',
-              type: 'image/png',
-              purpose: 'any maskable'
-            }
-          ],
+            { src: '/icons/icon-192.png', sizes: '192x192', type: 'image/png' },
+            { src: '/icons/icon-512.png', sizes: '512x512', type: 'image/png' }
+          ]
         },
         workbox: {
           globPatterns: ['**/*.{js,css,html,ico,png,svg}'],
@@ -82,7 +70,7 @@ export default defineConfig(({ mode }) => {
     },
     build: {
       minify: 'esbuild',
-      sourcemap: false,
+      sourcemap: true,
       rollupOptions: {
         output: {
           manualChunks: {
@@ -121,12 +109,6 @@ export default defineConfig(({ mode }) => {
           secure: false,
         },
       },
-    },
-    build: {
-      outDir: 'dist',
-      assetsDir: 'assets',
-      sourcemap: true,
-      emptyOutDir: true,
     },
   };
 });
