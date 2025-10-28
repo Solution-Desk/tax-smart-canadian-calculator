@@ -1,22 +1,36 @@
-import React, { StrictMode, Suspense } from 'react';
+import React, { StrictMode, Suspense, useEffect } from 'react';
 import { createRoot } from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';
-import { registerSW } from 'virtual:pwa-register';
+import { registerSW } from 'vite-plugin-pwa/register';
 import App from './App';
 import ErrorBoundary from './ErrorBoundary';
 import './index.css';
 
 // Register service worker for PWA
-const updateSW = registerSW({
-  onNeedRefresh() {
-    if (confirm('New content available. Reload?')) {
-      updateSW(true);
+if ('serviceWorker' in navigator) {
+  // Register the service worker
+  const registerServiceWorker = async () => {
+    try {
+      await registerSW({
+        onNeedRefresh() {
+          if (confirm('New version available! Reload to update?')) {
+            window.location.reload();
+          }
+        },
+        onOfflineReady() {
+          console.log('App ready to work offline');
+        },
+      });
+    } catch (error) {
+      console.error('Service Worker registration failed:', error);
     }
-  },
-  onOfflineReady() {
-    console.log('App ready to work offline');
-  },
-});
+  };
+
+  // Register after page load
+  window.addEventListener('load', () => {
+    registerServiceWorker();
+  });
+}
 
 // Get root element
 const rootElement = document.getElementById('root');
@@ -157,9 +171,21 @@ console.log(
   'color: #0ea5e9; font-size: 1.5em; font-weight: bold',
   'color: #64748b; font-size: 0.9em;',
   'color: #94a3b8; font-size: 0.8em;'
-      <BrowserRouter basename={normalizedBaseUrl}>
-        <App />
-      </BrowserRouter>
+);
+
+// Get the base URL from environment variable or use empty string for root
+const baseUrl = import.meta.env.BASE_URL || '';
+const normalizedBaseUrl = baseUrl.endsWith('/') ? baseUrl.slice(0, -1) : baseUrl;
+
+// Render the app
+createRoot(rootElement!).render(
+  <React.StrictMode>
+    <ErrorBoundary>
+      <Suspense fallback={<LoadingFallback />}>
+        <BrowserRouter basename={normalizedBaseUrl}>
+          <App />
+        </BrowserRouter>
+      </Suspense>
     </ErrorBoundary>
   </React.StrictMode>
 );

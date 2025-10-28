@@ -81,10 +81,10 @@ export default function App() {
 
   // Create a layout component that includes the ProLayout and theme toggle
   const Layout = useCallback(({ children }: { children: React.ReactNode }) => (
-    <ProLayout onToggleTheme={handleToggleTheme}>
+    <ProLayout onToggleTheme={toggleTheme}>
       {children}
     </ProLayout>
-  ), [handleToggleTheme]);
+  ), [toggleTheme]);
 
   useEffect(() => {
     // Simulate loading delay
