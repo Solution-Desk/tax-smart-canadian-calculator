@@ -78,25 +78,20 @@
     <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" />
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" media="print" onload="this.media='all'" />
     
-    <!-- No-JS Fallback -->
-    <noscript>
-      <style>
-        .no-js-message {
-          position: fixed;
-          top: 0;
-          left: 0;
-          right: 0;
-          background: #f8d7da;
-          color: #721c24;
-          padding: 1rem;
-          text-align: center;
-          z-index: 1000;
-        }
-      </style>
-      <div class="no-js-message">
-        <p>TaxSmart needs JavaScript to run. Please enable JavaScript to continue.</p>
-      </div>
-    </noscript>
+    <!-- No-JS Fallback Styles -->
+    <style>
+      .no-js-message {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        background: #f8d7da;
+        color: #721c24;
+        padding: 1rem;
+        text-align: center;
+        z-index: 1000;
+      }
+    </style>
 
     <!-- AdSense site verification: static head script so Google can detect it -->
     <!-- Uses Vite env placeholder; set VITE_ADSENSE_CLIENT_ID in CI or .env -->
@@ -142,6 +137,11 @@
     </style>
   </head>
   <body>
+    <noscript>
+      <div class="no-js-message">
+        <p>TaxSmart needs JavaScript to run. Please enable JavaScript to continue.</p>
+      </div>
+    </noscript>
     <div id="root">
       <div style="display: flex; justify-content: center; align-items: center; height: 100vh; background: #f8fafc;">
         <div style="text-align: center; padding: 2rem;">
