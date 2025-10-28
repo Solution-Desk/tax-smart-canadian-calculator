@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, lazy, Suspense } from 'react';
 import { Footer } from './components/Footer';
 import ErrorBoundary from './ErrorBoundary';
 import TaxSmartCalculator from './components/TaxSmartCalculator/TaxSmartCalculator';
@@ -7,7 +7,12 @@ import Privacy from './pages/Privacy';
 import Premium from './pages/Premium';
 import { ConsentBanner } from './components/ConsentBanner';
 import { PremiumActivator } from './components/PremiumActivator';
-import { Loader2, AlertCircle } from 'lucide-react';
+import { Loader2 } from 'lucide-react';
+import ProLayout from './components/ProLayout';
+
+// Lazy load Pro pages
+const ProSuccess = lazy(() => import('./pages/ProSuccess'));
+const ProCancel = lazy(() => import('./pages/ProCancel'));
 
 // Error fallback component
 const ErrorFallback = () => (
@@ -48,7 +53,7 @@ export default function App() {
     // Simulate loading delay
     const timer = setTimeout(() => {
       setIsLoading(false);
-    }, 2000);
+    }, 1000);
 
     // Clean up timer on unmount
     return () => clearTimeout(timer);
@@ -60,51 +65,61 @@ export default function App() {
   }
 
   return (
-    <div className="app-container">
-      <ErrorBoundary fallback={<ErrorFallback />} onError={() => setHasError(true)}>
-        <ConsentBanner />
-        <PremiumActivator>
-          <div className="flex flex-col min-h-screen">
-            <main className="flex-grow">
-              {isLoading ? (
-                <LoadingFallback />
-              ) : (
-                <Routes location={location} key={location.pathname}>
-                  <Route path="/privacy" element={<Privacy />} />
-                  <Route path="/premium" element={<Premium />} />
-                  <Route 
-                    path="/" 
-                    element={
-                      <div className="max-w-4xl mx-auto px-4 py-8">
-                        <TaxSmartCalculator />
-                      </div>
-                    } 
-                  />
-                  <Route path="*" element={
-                    <div className="max-w-4xl mx-auto px-4 py-8">
-                      <div className="bg-red-50 dark:bg-red-900/20 border-l-4 border-red-500 p-4 mb-6">
-                        <div className="flex">
-                          <div className="flex-shrink-0">
-                            <AlertCircle className="h-5 w-5 text-red-500" aria-hidden="true" />
-                          </div>
-                          <div className="ml-3">
-                            <h3 className="text-sm font-medium text-red-800 dark:text-red-200">Page not found</h3>
-                            <div className="mt-2 text-sm text-red-700 dark:text-red-300">
-                              <p>The page you're looking for doesn't exist or has been moved.</p>
-                            </div>
+    <ErrorBoundary fallback={ErrorFallback}>
+      {isLoading ? (
+        <LoadingFallback />
+      ) : (
+        <div className="min-h-screen flex flex-col bg-white dark:bg-gray-900">
+          <main className="flex-grow">
+            <PremiumActivator>
+              <Routes>
+                <Route path="/privacy" element={<Privacy />} />
+                <Route path="/premium" element={<Premium />} />
+                <Route path="/premium/activate" element={<PremiumActivator />} />
+                
+                {/* Pro Routes */}
+                <Route path="/pro/success" element={
+                  <ProLayout>
+                    <Suspense fallback={<LoadingFallback />}>
+                      <ProSuccess />
+                    </Suspense>
+                  </ProLayout>
+                } />
+                
+                <Route path="/pro/cancel" element={
+                  <ProLayout>
+                    <Suspense fallback={<LoadingFallback />}>
+                      <ProCancel />
+                    </Suspense>
+                  </ProLayout>
+                } />
+                
+                {/* 404 - Not Found */}
+                <Route path="*" element={
+                  <div className="container mx-auto p-4">
+                    <div className="bg-red-50 dark:bg-red-900/20 border-l-4 border-red-500 p-4 mb-6">
+                      <div className="flex">
+                        <div className="ml-3">
+                          <h3 className="text-sm font-medium text-red-800 dark:text-red-200">Page not found</h3>
+                          <div className="mt-2 text-sm text-red-700 dark:text-red-300">
+                            <p>The page you're looking for doesn't exist or has been moved.</p>
                           </div>
                         </div>
                       </div>
-                      <TaxSmartCalculator />
                     </div>
-                  } />
-                </Routes>
-              )}
-            </main>
-            <Footer />
-          </div>
-        </PremiumActivator>
-      </ErrorBoundary>
-    </div>
+                    <TaxSmartCalculator />
+                  </div>
+                } />
+                
+                {/* Default route */}
+                <Route path="/" element={<TaxSmartCalculator />} />
+              </Routes>
+            </PremiumActivator>
+          </main>
+          <Footer />
+          <ConsentBanner />
+        </div>
+      )}
+    </ErrorBoundary>
   );
 }

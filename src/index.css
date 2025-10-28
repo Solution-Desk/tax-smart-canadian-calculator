@@ -1,4 +1,6 @@
 :root {
+  --space: 12px;
+  --radius: 14px;
   color-scheme: dark;
   --bg: #050914;
   --surface: #0f172a;
@@ -48,6 +50,16 @@
   box-sizing: border-box;
   margin: 0;
   padding: 0;
+  -webkit-tap-highlight-color: transparent;
+}
+
+html, body, #root {
+  height: 100%;
+}
+
+.app {
+  min-height: 100dvh;
+  padding-bottom: calc(64px + env(safe-area-inset-bottom));
 }
 
 /* App Layout */
@@ -322,4 +334,93 @@ textarea {
     flex-direction: column;
     align-items: flex-start;
   }
+  
+  .wrap { 
+    padding: var(--space); 
+    gap: var(--space); 
+  }
+  
+  .card { 
+    border-radius: var(--radius); 
+    padding: var(--space); 
+  }
+  
+  .grid { 
+    display: grid; 
+    grid-template-columns: 1fr; 
+    gap: var(--space); 
+  }
+  
+  .row { 
+    display: grid; 
+    grid-template-columns: 1fr auto; 
+    gap: 8px; 
+    align-items: center; 
+  }
+  
+  .actions { 
+    display: flex; 
+    gap: 8px; 
+    flex-wrap: wrap; 
+  }
+  
+  h1 { 
+    font-size: 1.25rem; 
+    line-height: 1.2; 
+  }
+}
+
+/* Touch-friendly inputs and buttons */
+button, 
+.btn, 
+input, 
+select { 
+  min-height: 44px; 
+  font-size: 16px; 
+}
+
+/* Sticky total bar */
+.sticky-total {
+  position: fixed; 
+  left: 0; 
+  right: 0; 
+  bottom: 0;
+  padding: 10px calc(12px + env(safe-area-inset-right)) calc(10px + env(safe-area-inset-bottom)) calc(12px + env(safe-area-inset-left));
+  background: #0f172a; 
+  color: #fff; 
+  display: grid; 
+  grid-template-columns: 1fr auto; 
+  gap: 10px; 
+  align-items: center;
+  box-shadow: 0 -6px 24px rgba(2,8,23,.24);
+  z-index: 100;
+}
+
+.sticky-total .btn-primary { 
+  padding: 10px 14px; 
+  border-radius: 12px; 
+}
+
+/* Number stepper suppression for mobile */
+input[type=number]::-webkit-outer-spin-button,
+input[type=number]::-webkit-inner-spin-button { 
+  -webkit-appearance: none; 
+  margin: 0; 
+}
+
+input[type=number] { 
+  -moz-appearance: textfield; 
+}
+
+/* Screen reader only utility */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
 }
