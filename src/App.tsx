@@ -1,16 +1,27 @@
-import React, { useEffect, useState, lazy, Suspense } from 'react';
+import { useEffect, useState, lazy, Suspense, useCallback } from 'react';
+import { Routes, Route, useNavigate, useLocation } from 'react-router-dom';
+import { Loader2, Moon, Sun } from 'lucide-react';
 import { Footer } from './components/Footer';
 import ErrorBoundary from './ErrorBoundary';
-import TaxSmartCalculator from './components/TaxSmartCalculator/TaxSmartCalculator';
-import { Routes, Route, useLocation } from 'react-router-dom';
-import Privacy from './pages/Privacy';
-import Premium from './pages/Premium';
+import { TaxSmartCalculator } from './components/TaxSmartCalculator/TaxSmartCalculator';
+import { useDarkMode } from './hooks/useDarkMode';
 import { ConsentBanner } from './components/ConsentBanner';
 import { PremiumActivator } from './components/PremiumActivator';
-import { Loader2 } from 'lucide-react';
 import ProLayout from './components/ProLayout';
+import InstallPrompt from './components/InstallPrompt';
+import IOSHint from './components/IOSHint';
 
-// Lazy load Pro pages
+type ProLayoutProps = {
+  children: React.ReactNode;
+  onToggleTheme?: () => void;
+};
+
+// Lazy load pages
+const Privacy = lazy(() => import('./pages/Privacy'));
+const Pro = lazy(() => import('./pages/Pro'));
+const References = lazy(() => import('./pages/References'));
+const Sponsor = lazy(() => import('./pages/Sponsor'));
+const Premium = lazy(() => import('./pages/Premium'));
 const ProSuccess = lazy(() => import('./pages/ProSuccess'));
 const ProCancel = lazy(() => import('./pages/ProCancel'));
 
@@ -43,17 +54,43 @@ const LoadingFallback = () => (
   </div>
 );
 
+// Theme toggle button component
+const ThemeToggle = ({ isDark, toggleTheme }: { isDark: boolean; toggleTheme: () => void }) => (
+  <button
+    onClick={toggleTheme}
+    className="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
+    aria-label={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
+  >
+    {isDark ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
+  </button>
+);
+
 // App component with loading state
 export default function App() {
   const [isLoading, setIsLoading] = useState(true);
   const [hasError, setHasError] = useState(false);
   const location = useLocation();
+  const navigate = useNavigate();
+  const { theme, toggleTheme } = useDarkMode();
+  const isDark = theme === 'dark';
+
+  // Wrap with useCallback to prevent unnecessary re-renders
+  const handleToggleTheme = useCallback(() => {
+    toggleTheme();
+  }, [toggleTheme]);
+
+  // Create a layout component that includes the ProLayout and theme toggle
+  const Layout = useCallback(({ children }: { children: React.ReactNode }) => (
+    <ProLayout onToggleTheme={handleToggleTheme}>
+      {children}
+    </ProLayout>
+  ), [handleToggleTheme]);
 
   useEffect(() => {
     // Simulate loading delay
     const timer = setTimeout(() => {
       setIsLoading(false);
-    }, 1000);
+    }, 500);
 
     // Clean up timer on unmount
     return () => clearTimeout(timer);
@@ -65,59 +102,87 @@ export default function App() {
   }
 
   return (
-    <ErrorBoundary fallback={ErrorFallback}>
+    <ErrorBoundary fallback={<ErrorFallback />}>
       {isLoading ? (
         <LoadingFallback />
       ) : (
-        <div className="min-h-screen flex flex-col bg-white dark:bg-gray-900">
-          <main className="flex-grow">
+        <div className={`min-h-screen flex flex-col ${isDark ? 'dark' : ''}`}>
+          <div className="flex-grow">
             <PremiumActivator>
-              <Routes>
-                <Route path="/privacy" element={<Privacy />} />
-                <Route path="/premium" element={<Premium />} />
-                <Route path="/premium/activate" element={<PremiumActivator />} />
-                
-                {/* Pro Routes */}
-                <Route path="/pro/success" element={
-                  <ProLayout>
-                    <Suspense fallback={<LoadingFallback />}>
+              <Suspense fallback={<LoadingFallback />}>
+                <Routes>
+                  <Route path="/" element={
+                    <Layout>
+                      <TaxSmartCalculator />
+                    </Layout>
+                  } />
+                  <Route path="/privacy" element={
+                    <Layout>
+                      <Privacy />
+                    </Layout>
+                  } />
+                  <Route path="/pro" element={
+                    <Layout>
+                      <Pro />
+                    </Layout>
+                  } />
+                  <Route path="/pro/success" element={
+                    <Layout>
                       <ProSuccess />
-                    </Suspense>
-                  </ProLayout>
-                } />
-                
-                <Route path="/pro/cancel" element={
-                  <ProLayout>
-                    <Suspense fallback={<LoadingFallback />}>
+                    </Layout>
+                  } />
+                  <Route path="/pro/cancel" element={
+                    <Layout>
                       <ProCancel />
-                    </Suspense>
-                  </ProLayout>
-                } />
-                
-                {/* 404 - Not Found */}
-                <Route path="*" element={
-                  <div className="container mx-auto p-4">
-                    <div className="bg-red-50 dark:bg-red-900/20 border-l-4 border-red-500 p-4 mb-6">
-                      <div className="flex">
-                        <div className="ml-3">
-                          <h3 className="text-sm font-medium text-red-800 dark:text-red-200">Page not found</h3>
-                          <div className="mt-2 text-sm text-red-700 dark:text-red-300">
-                            <p>The page you're looking for doesn't exist or has been moved.</p>
+                    </Layout>
+                  } />
+                  <Route path="/references" element={
+                    <Layout>
+                      <References />
+                    </Layout>
+                  } />
+                  <Route path="/sponsor" element={
+                    <Layout>
+                      <Sponsor />
+                    </Layout>
+                  } />
+                  <Route path="/premium" element={
+                    <Layout>
+                      <Premium />
+                    </Layout>
+                  } />
+                  {/* 404 - Not Found */}
+                  <Route path="*" element={
+                    <Layout>
+                      <div className="container mx-auto p-4">
+                        <div className="bg-red-50 dark:bg-red-900/20 border-l-4 border-red-500 p-4 mb-6">
+                          <div className="flex">
+                            <div className="ml-3">
+                              <h3 className="text-sm font-medium text-red-800 dark:text-red-200">Page not found</h3>
+                              <div className="mt-2 text-sm text-red-700 dark:text-red-300">
+                                <p>The page you're looking for doesn't exist or has been moved.</p>
+                              </div>
+                              <button 
+                                onClick={() => navigate('/')}
+                                className="mt-2 text-sm text-indigo-600 dark:text-indigo-400 hover:underline"
+                              >
+                                Return to calculator
+                              </button>
+                            </div>
                           </div>
                         </div>
+                        <TaxSmartCalculator />
                       </div>
-                    </div>
-                    <TaxSmartCalculator />
-                  </div>
-                } />
-                
-                {/* Default route */}
-                <Route path="/" element={<TaxSmartCalculator />} />
-              </Routes>
+                    </Layout>
+                  } />
+                </Routes>
+              </Suspense>
             </PremiumActivator>
-          </main>
+          </div>
           <Footer />
           <ConsentBanner />
+          <InstallPrompt />
+          <IOSHint />
         </div>
       )}
     </ErrorBoundary>

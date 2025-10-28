@@ -1,18 +1,53 @@
-import React from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { Moon, Sun } from 'lucide-react';
 
 interface ProLayoutProps {
   children: React.ReactNode;
+  onToggleTheme?: () => void;
 }
 
-export default function ProLayout({ children }: ProLayoutProps) {
+function ProLayout({ children, onToggleTheme }: ProLayoutProps) {
+  const [isDark, setIsDark] = useState(false);
+
+  // Update dark mode state when it changes
+  useEffect(() => {
+    const updateDarkMode = () => {
+      setIsDark(document.documentElement.classList.contains('dark'));
+    };
+    
+    // Initial check
+    updateDarkMode();
+    
+    // Watch for changes to the class list
+    const observer = new MutationObserver(updateDarkMode);
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ['class']
+    });
+    
+    return () => observer.disconnect();
+  }, []);
   return (
     <div className="pro-layout">
       <header className="pro-header">
-        <div className="container">
+        <div className="container flex justify-between items-center">
           <Link to="/" className="logo">
             TaxSmart <span className="pro-badge">Pro</span>
           </Link>
+          {onToggleTheme !== undefined && (
+            <button
+              onClick={onToggleTheme}
+              className="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
+              aria-label={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
+            >
+              {isDark ? (
+                <Sun className="w-5 h-5" />
+              ) : (
+                <Moon className="w-5 h-5" />
+              )}
+            </button>
+          )}
         </div>
       </header>
       <main className="pro-main">
@@ -29,6 +64,8 @@ export default function ProLayout({ children }: ProLayoutProps) {
     </div>
   );
 }
+
+export default ProLayout;
 
 // Add these styles to your main CSS file
 /*

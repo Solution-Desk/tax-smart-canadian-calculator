@@ -22,6 +22,7 @@ import "./TaxSmartCalculator.css"
 import { AdSlot } from '../ads/AdSlot'
 import { usePremium } from '../../hooks/usePremium'
 import { UpgradePrompt } from '../UpgradePrompt'
+import Totals from '../Totals'
 
 type TaxCategoryInfo = {
   category: string;
@@ -29,58 +30,148 @@ type TaxCategoryInfo = {
   taxRates: string;
   examples: string[];
 };
-// --- Required handlers (missing previously) ---
 
-const handleUpdateItem = (id: string, changes: Partial<LineItemForm>) => {
-  setItems(prev => prev.map(it => it.id === id ? { ...it, ...changes } : it));
+// Constants
+const CONTACT_EMAIL = 'support@taxsmart.ca';
+
+// Helper function to show notices
+const useNotice = () => {
+  const [notice, setNotice] = useState<string | null>(null);
+  const [emailNotice, setEmailNotice] = useState<string | null>(null);
+
+  const showNotice = useCallback((message: string) => {
+    setNotice(message);
+    setTimeout(() => setNotice(null), 3000);
+  }, []);
+
+  const showEmailNotice = useCallback((message: string) => {
+    setEmailNotice(message);
+    setTimeout(() => setEmailNotice(null), 3000);
+  }, []);
+
+  return { notice, emailNotice, showNotice, showEmailNotice };
 };
 
-const handleRemoveItem = (id: string) => {
-  setItems(prev => prev.filter(it => it.id !== id));
+// Helper functions for tax rate formatting
+const formatRate = (rate: number | undefined): string => {
+  if (rate === undefined) return '0%';
+  return `${(rate * 100).toFixed(2)}%`;
 };
 
-const handleAddItem = (overrides?: Partial<LineItemForm>) => {
-  setItems(prev => [...prev, createLineItem(prev.length + 1, overrides ?? {})]);
+// Tax rate calculation functions
+const getStandardTaxRate = (province: Province): string => {
+  const rates = TAX_RATES[province];
+  if (!rates) return '0%';
+  if (rates.kind === 'HST') return formatRate(rates.hst);
+  return `${formatRate(rates.pst)} PST + ${formatRate(rates.gst)} GST`;
 };
 
-const handleCopyAppLink = async () => {
-  if (typeof window === 'undefined') return;
-  const url = `${window.location.origin}${window.location.pathname}`;
-  try {
-    await navigator.clipboard.writeText(url);
-    showNotice('App link copied');
-  } catch {
-    showNotice('Could not copy link');
-  }
+const getGroceryTaxRate = (province: Province): string => {
+  const rates = TAX_RATES[province];
+  if (!rates) return '0%';
+  return rates.kind === 'HST' ? '0%' : '0% PST + 0% GST';
 };
 
-const handleCopyShareLink = async () => {
-  if (typeof window === 'undefined') return;
-  const shareState = {
-    province,
-    items: items.map(({ label, category, amount }) => ({ label, category, amount })),
-  };
-  const hash = encodeState(shareState); // from src/lib/share
-  const url = `${window.location.origin}${window.location.pathname}#${hash}`;
-  try {
-    await navigator.clipboard.writeText(url);
-    showNotice('Shareable link copied');
-  } catch {
-    showNotice('Could not copy link');
-  }
-};
+export const TaxSmartCalculator = () => {
+  // State
+  const [items, setItems] = useState<LineItemForm[]>([]);
+  const [province, setProvince] = useState<Province>(DEFAULT_PROVINCE);
+  const { notice, emailNotice, showNotice, showEmailNotice } = useNotice();
+  const { isPremium } = usePremium();
+  const { theme } = useDarkMode();
+  const isDark = theme === 'dark';
+  
+  // UI State
+  const [helperGuess, setHelperGuess] = useState<string[]>([]);
+  const [suggestedCat, setSuggestedCat] = useState<Record<string, Category>>({});
+  const [isPremiumModalOpen, setPremiumModalOpen] = useState(false);
+  const [isReferencesModalOpen, setReferencesModalOpen] = useState(false);
+  const [isTaxInfoModalOpen, setTaxInfoModalOpen] = useState(false);
+  const [showPremiumTooltip, setShowPremiumTooltip] = useState(false);
+  const [showCategoryInfo, setShowCategoryInfo] = useState(false);
+  const [activePreset, setActivePreset] = useState<string | null>(null);
+  const [showProvinceTooltip, setShowProvinceTooltip] = useState(false);
 
-const handleCopyEmail = async () => {
-  try {
-    await navigator.clipboard.writeText(CONTACT_EMAIL);
-    showEmailNotice('Email copied');
-  } catch {
-    showEmailNotice('Could not copy email');
-  }
-};
+  // Handlers
+  const handleUpdateItem = useCallback((id: string, changes: Partial<LineItemForm>) => {
+    setItems(prev => prev.map(it => it.id === id ? { ...it, ...changes } : it));
+  }, []);
 
-const getCategoryInfo = (province: string): TaxCategoryInfo[] => [
-  {
+  const handleRemoveItem = useCallback((id: string) => {
+    setItems(prev => prev.filter(it => it.id !== id));
+  }, []);
+
+  const handleAddItem = useCallback((overrides?: Partial<LineItemForm>) => {
+    setItems(prev => [...prev, createLineItem(prev.length + 1, overrides ?? {})]);
+  }, []);
+
+  // Calculate totals
+  const numericItems = useMemo<LineItemInput[]>(
+    () => items.map((item) => ({
+      amount: parseAmount(item.amount),
+      category: item.category
+    })),
+    [items]
+  );
+
+  const { totals } = useMemo(
+    () => calculateTotals(numericItems, province),
+    [numericItems, province]
+  );
+  
+  // Get the total amount from the totals
+  const totalAmount = totals?.total ?? 0;
+
+  const paymentLink = import.meta.env.VITE_STRIPE_PAYMENT_LINK as string | undefined
+  const provincialLabel = getProvincialLabel(TAX_RATES[province].kind)
+  const provincialRate = getProvincialRate(province)
+
+  const showNotice = useCallback((message: string) => {
+    setNotice(message);
+    setTimeout(() => setNotice(null), 3000);
+  }, []);
+
+  const handleCopyAppLink = useCallback(async () => {
+    if (typeof window === 'undefined') return;
+    const url = `${window.location.origin}${window.location.pathname}`;
+    try {
+      await navigator.clipboard.writeText(url);
+      showNotice('App link copied');
+    } catch {
+      showNotice('Could not copy link');
+    }
+  }, [showNotice]);
+
+  const handleCopyShareLink = useCallback(async () => {
+    if (typeof window === 'undefined') return;
+    const shareState = {
+      province,
+      items: items.map(({ label, category, amount }) => ({ label, category, amount })),
+    };
+    const hash = encodeState(shareState);
+    const url = `${window.location.origin}${window.location.pathname}#${hash}`;
+    try {
+      await navigator.clipboard.writeText(url);
+      showNotice('Shareable link copied');
+    } catch {
+      showNotice('Could not copy link');
+    }
+  }, [province, items, showNotice]);
+
+  const handleCopyEmail = useCallback(async () => {
+    try {
+      await navigator.clipboard.writeText(CONTACT_EMAIL);
+      showEmailNotice('Email copied');
+    } catch {
+      showEmailNotice('Could not copy email');
+    }
+  }, [showEmailNotice]);
+
+  // Tax rate helpers (using the functions defined above)
+
+  // Category information
+  const categoryInfo = useMemo((): TaxCategoryInfo[] => [
+    {
     category: 'Standard',
     description: 'Most goods and services',
     taxRates: getStandardTaxRate(province),
@@ -128,7 +219,7 @@ const getCategoryInfo = (province: string): TaxCategoryInfo[] => [
     taxRates: getBookTaxRate(province),
     examples: ['Novels', 'Textbooks', 'Non-fiction']
   }
-];
+]);
 
 function getStandardTaxRate(province: string): string {
   const rates = TAX_RATES[province as Province];
@@ -262,7 +353,6 @@ function toShareableItems(items: LineItemForm[]) {
   return items.map(({ label, category, amount }) => ({ label, category, amount }))
 }
 
-export default function TaxSmartCalculator() {
   const { theme, toggleTheme } = useDarkMode('dark');
   const [province, setProvince] = useLocalStorage<Province>('taxapp:province', DEFAULT_PROVINCE)
   const { isPremium, enable } = usePremium()
@@ -277,9 +367,10 @@ export default function TaxSmartCalculator() {
   const [isPremiumModalOpen, setPremiumModalOpen] = useState(false)
   const [isReferencesModalOpen, setReferencesModalOpen] = useState(false)
   const [isTaxInfoModalOpen, setTaxInfoModalOpen] = useState(false)
-  const [showProvinceTooltip, setShowProvinceTooltip] = useState(false)
-  const emailNoticeTimeoutRef = useRef<number | null>(null)
+  // Moved to top with other state declarations
+  const [showProvinceTooltip, setShowProvinceTooltip] = useState(false);
   const noticeTimeoutRef = useRef<number | null>(null)
+  const emailNoticeTimeoutRef = useRef<number | null>(null)
 
   const numericItems = useMemo<LineItemInput[]>(
     () => items.map((item) => ({ amount: parseAmount(item.amount), category: item.category })),
@@ -289,7 +380,10 @@ export default function TaxSmartCalculator() {
   const { totals } = useMemo(
     () => calculateTotals(numericItems, province),
     [numericItems, province]
-  )
+  );
+  
+  // Get the total amount from the totals
+  const totalAmount = totals?.total ?? 0;
 
   const paymentLink = import.meta.env.VITE_STRIPE_PAYMENT_LINK as string | undefined
   const provincialLabel = getProvincialLabel(TAX_RATES[province].kind)
@@ -487,7 +581,7 @@ export default function TaxSmartCalculator() {
         title="Tax Categories & Rates"
       >
         <div className="tax-categories">
-          {getCategoryInfo(province).map(({ category, description, taxRates, examples }) => (
+          {categoryInfo.map(({ category, description, taxRates, examples }: TaxCategoryInfo) => (
             <div key={category} className="tax-category">
               <div className="tax-category-header">
                 <h3 className="tax-category-name">{category}</h3>
@@ -769,50 +863,16 @@ export default function TaxSmartCalculator() {
           </p>
         </section>
 
-        <section className="panel totals-panel">
-          <div className="panel-header">
-            <h2 className="panel-title">Totals</h2>
-            <div className="header-actions">
-              <button type="button" className="btn" onClick={handleCopyAppLink}>
-                Share app
-              </button>
-              <button type="button" className="btn" onClick={handleCopyShareLink}>
-                Copy results
-              </button>
-            </div>
-          </div>
-          <div className="totals-grid">
-            <article className="total-card">
-              <p className="muted">Subtotal</p>
-              <p className="total-value">{formatCurrency(totals.subTotal)}</p>
-            </article>
-            {TAX_RATES[province].kind === 'HST' ? (
-              <article className="total-card">
-                <p className="muted">HST</p>
-                <p className="total-value">{formatCurrency(totals.hst)}</p>
-              </article>
-            ) : (
-              <>
-                <article className="total-card">
-                  <p className="muted">GST</p>
-                  <p className="total-value">{formatCurrency(totals.federal)}</p>
-                </article>
-                <article className="total-card">
-                  <p className="muted">{provincialLabel}</p>
-                  <p className="total-value">{formatCurrency(totals.provincial)}</p>
-                </article>
-              </>
-            )}
-            <article className="total-card">
-              <p className="muted">Total tax</p>
-              <p className="total-value">{formatCurrency(totals.tax)}</p>
-            </article>
-            <article className="total-card highlight">
-              <p className="muted">Grand total</p>
-              <p className="total-value">{formatCurrency(totals.grandTotal)}</p>
-            </article>
-          </div>
-        </section>
+        <Totals
+          province={province}
+          subTotal={totals?.subTotal ?? 0}
+          federal={totals?.federal ?? 0}
+          provincial={totals?.provincial ?? 0}
+          hst={totals?.hst ?? 0}
+          total={totalAmount}
+          onShareApp={handleCopyAppLink}
+          onCopyResults={handleCopyShareLink}
+        />
 
         <section className="panel">
           <h2 className="panel-title">Need help or have ideas?</h2>
