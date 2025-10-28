@@ -27,6 +27,8 @@ jobs:
         run: npm ci
 
       - name: Build
+        env:
+          VITE_ADSENSE_CLIENT_ID: ${{ secrets.ADSENSE_CLIENT_ID }}
         run: |
           if [ "${{ github.event_name }}" = "workflow_dispatch" ] || [ "${{ github.event_name }}" = "push" ]; then
             GITHUB_PAGES=true VITE_USE_CUSTOM_DOMAIN=true npm run build
