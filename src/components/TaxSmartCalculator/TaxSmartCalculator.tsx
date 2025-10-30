@@ -1,38 +1,46 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import {
-  CATEGORY_OPTIONS,
-  Category,
-  DEFAULT_PROVINCE,
-  PROVINCES,
-  Province,
-  TAX_RATES,
-  getProvincialLabel,
-  getProvincialRate,
-  PREMIUM_CATEGORIES,
-} from "../../lib/taxData"
-import { LineItemInput, calculateTotals, validateCategory } from "../../lib/taxCalculator"
-import { encodeState, extractStateFromHash } from "../../lib/share"
-import { useDarkMode } from "../../hooks/useDarkMode"
-import { useLocalStorage } from "../../hooks/useAutoCalc"
-import { TAX_PRESETS } from "../../lib/taxPresets"
-import { Sparkles, Info, X, HelpCircle } from 'lucide-react'
-import { Modal } from '../Modal'
-import { CategoryTooltip } from '../ui/Tooltip'
-import "./TaxSmartCalculator.css"
-import { AdSlot } from '../ads/AdSlot'
-import { usePremium } from '../../hooks/usePremium'
-import { UpgradePrompt } from '../UpgradePrompt'
-import Totals from '../Totals'
+import { useEffect, useState } from 'react';
+import AppBar from './components/AppBar';
+import ProvinceSelector from './components/ProvinceSelector';
+import TotalsDisplay from './components/TotalsDisplay';
+import LineItems from './components/LineItems';
+import useTaxCalculations, { type LineItem } from './hooks/useTaxCalculations';
+import { ProvinceCode } from './data/rates';
+import { fmtCAD } from '../../lib/money';
+import { CategoryTooltip } from '../ui/Tooltip';
+import { AdSlot } from '../ads/AdSlot';
+import { UpgradePrompt } from '../UpgradePrompt';
+import Totals from '../Totals';
 
-type TaxCategoryInfo = {
+// Styles
+import "./TaxSmartCalculator.css";
+
+interface TaxCategoryInfo {
   category: string;
   description: string;
   taxRates: string;
   examples: string[];
-};
+}
+
+interface LineItemForm {
+  id: string;
+  label: string;
+  category: Category;
+  amount: string;
+}
 
 // Constants
-const CONTACT_EMAIL = 'support@taxsmart.ca';
+const CONTACT_EMAIL = 'taxapp@thesolutiondesk.ca';
+
+// Formatters
+const CURRENCY = new Intl.NumberFormat('en-CA', { 
+  style: 'currency', 
+  currency: 'CAD' 
+});
+
+const PERCENT_FORMATTER = new Intl.NumberFormat('en-CA', {
+  minimumFractionDigits: 2,
+  maximumFractionDigits: 2,
+});
 
 // Helper function to show notices
 const useNotice = () => {
@@ -52,79 +60,100 @@ const useNotice = () => {
   return { notice, emailNotice, showNotice, showEmailNotice };
 };
 
-// Helper functions for tax rate formatting
-const formatRate = (rate: number | undefined): string => {
-  if (rate === undefined) return '0%';
-  return `${(rate * 100).toFixed(2)}%`;
+// Helper functions for tax rate formatting and calculations
+const formatRatePct = (rate: number | undefined): string => {
+  return rate !== undefined ? PERCENT_FORMATTER.format(rate) : '0%';
 };
 
-// Tax rate calculation functions
-const getStandardTaxRate = (province: Province): string => {
-  const rates = TAX_RATES[province];
+const getStandardTaxRate = (province: string): string => {
+  const rates = TAX_RATES[province as Province];
   if (!rates) return '0%';
-  if (rates.kind === 'HST') return formatRate(rates.hst);
-  return `${formatRate(rates.pst)} PST + ${formatRate(rates.gst)} GST`;
+  
+  if (rates.kind === 'HST') return `${formatRatePct(rates.hst || 0)} HST`;
+  if (rates.kind === 'GST_PST') return `${formatRatePct(rates.gst || 0)} GST + ${formatRatePct(rates.pst || 0)} PST`;
+  if (rates.kind === 'GST_QST') return `${formatRatePct(rates.gst || 0)} GST + ${formatRatePct(rates.qst || 0)} QST`;
+  return `${formatRatePct(rates.gst || 0)} GST`;
 };
 
-const getGroceryTaxRate = (province: Province): string => {
-  const rates = TAX_RATES[province];
+const getGroceryTaxRate = (province: string): string => {
+  const rates = TAX_RATES[province as Province];
   if (!rates) return '0%';
-  return rates.kind === 'HST' ? '0%' : '0% PST + 0% GST';
+  
+  if (['SK', 'MB', 'QC'].includes(province)) {
+    const pst = province === 'QC' ? (rates.qst || 0) : (rates.pst || 0);
+    const label = province === 'QC' ? 'QST' : 'PST';
+    return `0% GST + ${formatRatePct(pst)} ${label}`;
+  }
+  return '0%';
+};
+
+const getChildrensClothingTaxRate = (province: string): string => {
+  if (['ON', 'NS', 'PE', 'BC'].includes(province)) return '0%';
+  if (province === 'MB') return '0% (up to $150)';
+  return getStandardTaxRate(province);
+};
+
+const getBookTaxRate = (province: string): string => {
+  if (['ON', 'NS', 'NB', 'NL', 'PE', 'BC', 'MB', 'SK', 'QC'].includes(province)) {
+    return '0%';
+  }
+  return getStandardTaxRate(province);
 };
 
 export const TaxSmartCalculator = () => {
   // State
-  const [items, setItems] = useState<LineItemForm[]>([]);
-  const [province, setProvince] = useState<Province>(DEFAULT_PROVINCE);
+  const [lineItems, setLineItems] = useState<LineItemForm[]>([]);
+  const [currentProvince, setCurrentProvince] = useState<Province>(DEFAULT_PROVINCE);
   const { notice, emailNotice, showNotice, showEmailNotice } = useNotice();
-  const { isPremium } = usePremium();
-  const { theme } = useDarkMode();
-  const isDark = theme === 'dark';
+  const { isPremium: hasPremium } = usePremium();
+  const { theme: currentTheme } = useDarkMode();
+  const isDark = currentTheme === 'dark';
   
   // UI State
-  const [helperGuess, setHelperGuess] = useState<string[]>([]);
-  const [suggestedCat, setSuggestedCat] = useState<Record<string, Category>>({});
-  const [isPremiumModalOpen, setPremiumModalOpen] = useState(false);
-  const [isReferencesModalOpen, setReferencesModalOpen] = useState(false);
-  const [isTaxInfoModalOpen, setTaxInfoModalOpen] = useState(false);
+  const [helperGuesses, setHelperGuesses] = useState<string[]>([]);
+  const [suggestedCategories, setSuggestedCategories] = useState<Record<string, Category>>({});
+  const [isPremiumModalOpen, setIsPremiumModalOpen] = useState(false);
+  const [isReferencesModalOpen, setIsReferencesModalOpen] = useState(false);
+  const [isTaxInfoModalOpen, setIsTaxInfoModalOpen] = useState(false);
   const [showPremiumTooltip, setShowPremiumTooltip] = useState(false);
   const [showCategoryInfo, setShowCategoryInfo] = useState(false);
   const [activePreset, setActivePreset] = useState<string | null>(null);
   const [showProvinceTooltip, setShowProvinceTooltip] = useState(false);
+  const inputRef = useRef<HTMLInputElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
 
   // Handlers
   const handleUpdateItem = useCallback((id: string, changes: Partial<LineItemForm>) => {
-    setItems(prev => prev.map(it => it.id === id ? { ...it, ...changes } : it));
+    setLineItems(prev => prev.map(it => it.id === id ? { ...it, ...changes } : it));
   }, []);
 
   const handleRemoveItem = useCallback((id: string) => {
-    setItems(prev => prev.filter(it => it.id !== id));
+    setLineItems(prev => prev.filter(it => it.id !== id));
   }, []);
 
   const handleAddItem = useCallback((overrides?: Partial<LineItemForm>) => {
-    setItems(prev => [...prev, createLineItem(prev.length + 1, overrides ?? {})]);
+    setLineItems(prev => [...prev, createLineItem(prev.length + 1, overrides ?? {})]);
   }, []);
 
   // Calculate totals
   const numericItems = useMemo<LineItemInput[]>(
-    () => items.map((item) => ({
+    () => lineItems.map((item) => ({
       amount: parseAmount(item.amount),
       category: item.category
     })),
-    [items]
+    [lineItems]
   );
 
   const { totals } = useMemo(
-    () => calculateTotals(numericItems, province),
-    [numericItems, province]
+    () => calculateTotals(numericItems, currentProvince),
+    [numericItems, currentProvince]
   );
   
-  // Get the total amount from the totals
   const totalAmount = totals?.total ?? 0;
 
-  const paymentLink = import.meta.env.VITE_STRIPE_PAYMENT_LINK as string | undefined
-  const provincialLabel = getProvincialLabel(TAX_RATES[province].kind)
-  const provincialRate = getProvincialRate(province)
+  const paymentLink = import.meta.env.VITE_STRIPE_PAYMENT_LINK as string | undefined;
+  const provincialLabel = getProvincialLabel(TAX_RATES[currentProvince].kind);
+  const provincialRate = getProvincialRate(currentProvince);
 
   const showNotice = useCallback((message: string) => {
     setNotice(message);
@@ -145,18 +174,18 @@ export const TaxSmartCalculator = () => {
   const handleCopyShareLink = useCallback(async () => {
     if (typeof window === 'undefined') return;
     const shareState = {
-      province,
-      items: items.map(({ label, category, amount }) => ({ label, category, amount })),
+      province: currentProvince,
+      items: lineItems.map(({ label, category, amount }) => ({ label, category, amount })),
     };
     const hash = encodeState(shareState);
     const url = `${window.location.origin}${window.location.pathname}#${hash}`;
     try {
       await navigator.clipboard.writeText(url);
-      showNotice('Shareable link copied');
+      showNoticeCallback('Shareable link copied');
     } catch {
-      showNotice('Could not copy link');
+      showNoticeCallback('Could not copy link');
     }
-  }, [province, items, showNotice]);
+  }, [currentProvince, lineItems, showNoticeCallback]);
 
   const handleCopyEmail = useCallback(async () => {
     try {
@@ -167,104 +196,57 @@ export const TaxSmartCalculator = () => {
     }
   }, [showEmailNotice]);
 
-  // Tax rate helpers (using the functions defined above)
-
   // Category information
   const categoryInfo = useMemo((): TaxCategoryInfo[] => [
     {
-    category: 'Standard',
-    description: 'Most goods and services',
-    taxRates: getStandardTaxRate(province),
-    examples: ['Electronics', 'Furniture', 'Clothing (adult)']
-  },
-  {
-    category: 'Zero-rated (basic groceries)',
-    description: 'Most food and beverages for home consumption',
-    taxRates: getGroceryTaxRate(province),
-    examples: ['Milk', 'Bread', 'Fruits & Vegetables']
-  },
-  {
-    category: 'Prepared food / restaurant',
-    description: 'Food and beverages prepared by a restaurant or similar',
-    taxRates: getStandardTaxRate(province),
-    examples: ['Restaurant meals', 'Takeout', 'Food court items']
-  },
-  {
-    category: 'Children\'s clothing & footwear',
-    description: 'Clothing and footwear for children under a certain age',
-    taxRates: getChildrensClothingTaxRate(province),
-    examples: ['Kids\' shirts', 'Children\'s shoes']
-  },
-  {
-    category: 'Exempt',
-    description: 'Items exempt from all sales taxes',
-    taxRates: '0%',
-    examples: ['Prescription drugs', 'Basic groceries in most provinces']
-  },
-  {
-    category: 'Feminine hygiene products',
-    description: 'Menstrual products and similar items',
-    taxRates: '0%',
-    examples: ['Tampons', 'Pads', 'Menstrual cups']
-  },
-  {
-    category: 'Public transit fares',
-    description: 'Public transportation tickets and passes',
-    taxRates: '0%',
-    examples: ['Bus tickets', 'Subway passes']
-  },
-  {
-    category: 'Printed books (qualifying)',
-    description: 'Physical books',
-    taxRates: getBookTaxRate(province),
-    examples: ['Novels', 'Textbooks', 'Non-fiction']
-  }
-]);
-
-function getStandardTaxRate(province: string): string {
-  const rates = TAX_RATES[province as Province];
-  if (rates.kind === 'HST') return `${formatRatePct(rates.hst || 0)} HST`;
-  if (rates.kind === 'GST_PST') return `${formatRatePct(rates.gst)} GST + ${formatRatePct(rates.pst)} PST`;
-  if (rates.kind === 'GST_QST') return `${formatRatePct(rates.gst)} GST + ${formatRatePct(rates.qst)} QST`;
-  return `${formatRatePct(rates.gst)} GST`;
-}
-
-function getGroceryTaxRate(province: string): string {
-  const rates = TAX_RATES[province as Province];
-  if (['SK', 'MB', 'QC'].includes(province)) {
-    const pst = province === 'QC' ? rates.qst : rates.pst;
-    const label = province === 'QC' ? 'QST' : 'PST';
-    return `0% GST + ${formatRatePct(pst)} ${label}`;
-  }
-  return '0% GST';
-}
-
-function getChildrensClothingTaxRate(province: string): string {
-  if (['ON', 'NS', 'PE', 'BC'].includes(province)) return '0%';
-  if (province === 'MB') return '0% (up to $150)';
-  return getStandardTaxRate(province);
-}
-
-function getBookTaxRate(province: string): string {
-  if (['ON', 'NS', 'NB', 'NL', 'PE', 'BC', 'MB', 'SK', 'QC'].includes(province)) {
-    return '0%';
-  }
-  return getStandardTaxRate(province);
-}
-
-type LineItemForm = {
-  id: string
-  label: string
-  category: Category
-  amount: string
-}
-
-const CURRENCY = new Intl.NumberFormat('en-CA', { style: 'currency', currency: 'CAD' })
-const PERCENT_FORMATTER = new Intl.NumberFormat('en-CA', {
-  minimumFractionDigits: 2,
-  maximumFractionDigits: 2,
-})
-const CONTACT_EMAIL = 'taxapp@thesolutiondesk.ca'
+      category: 'Standard',
+      description: 'Most goods and services',
+      taxRates: getStandardTaxRate(currentProvince),
+      examples: ['Electronics', 'Furniture', 'Clothing (adult)']
+    },
+    {
+      category: 'Zero-rated (basic groceries)',
+      description: 'Most food and beverages for home consumption',
+      taxRates: getGroceryTaxRate(currentProvince),
+      examples: ['Milk', 'Bread', 'Fruits & Vegetables']
+    },
+    {
+      category: 'Prepared food / restaurant',
+      description: 'Food and beverages prepared by a restaurant or similar',
+      taxRates: getStandardTaxRate(currentProvince),
+      examples: ['Restaurant meals', 'Takeout', 'Food court items']
+    },
+    {
+      category: 'Children\'s clothing & footwear',
+      description: 'Clothing and footwear for children under a certain age',
+      taxRates: getChildrensClothingTaxRate(currentProvince),
+      examples: ['Kids\' shirts', 'Children\'s shoes']
+    },
+    {
+      category: 'Exempt',
+      description: 'Items exempt from all sales taxes',
+      taxRates: '0%',
+      examples: ['Prescription drugs', 'Basic groceries in most provinces']
+    },
+    {
+      category: 'Feminine hygiene products',
+      description: 'Menstrual products and similar items',
+      taxRates: '0%',
+      examples: ['Tampons', 'Pads', 'Menstrual cups']
+    },
+    {
+      category: 'Public transit fares',
+      description: 'Public transportation tickets and passes',
+      taxRates: '0%',
+      examples: ['Bus tickets', 'Subway passes']
+    },
+    {
+      category: 'Printed books (qualifying)',
+      description: 'Physical books',
+      taxRates: getBookTaxRate(currentProvince),
+      examples: ['Novels', 'Textbooks', 'Non-fiction']
+    }
+  ], [currentProvince]);
 
 const COMING_SOON_FEATURES = [
   {

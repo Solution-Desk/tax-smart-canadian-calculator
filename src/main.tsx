@@ -1,9 +1,6 @@
 import React, { StrictMode, Suspense, useEffect } from 'react';
 import { createRoot } from 'react-dom/client';
-import { BrowserRouter } from 'react-router-dom';
-import { registerSW } from 'vite-plugin-pwa/register';
-import App from './App';
-import ErrorBoundary from './ErrorBoundary';
+import RefactoredCalculator from './components/TaxSmartCalculator/RefactoredCalculator';
 import './index.css';
 
 // Register service worker for PWA

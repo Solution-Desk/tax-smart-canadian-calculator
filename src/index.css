@@ -70,6 +70,93 @@ html, body, #root {
   padding-top: var(--space);
 }
 
+.totals-chip {
+  position: fixed;
+  left: 12px;
+  right: 12px;
+  bottom: 12px;
+  z-index: 30;
+  padding: 12px 16px;
+  border-radius: 14px;
+  background: var(--accent-strong);
+  color: white;
+  font-weight: 600;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: var(--shadow);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid var(--border);
+  cursor: pointer;
+  transition: transform 0.2s, opacity 0.2s;
+}
+
+.totals-chip:active {
+  transform: scale(0.98);
+  opacity: 0.9;
+}
+
+.totals-sheet {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: -70vh;
+  z-index: 35;
+  background: var(--surface);
+  border-top-left-radius: 16px;
+  border-top-right-radius: 16px;
+  box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.35);
+  transition: bottom 0.25s ease-out;
+  padding: 16px;
+  max-height: 70vh;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.ts-totals-open .totals-sheet {
+  bottom: 0;
+}
+
+/* Add space for the chip on mobile */
+.wrap {
+  padding-bottom: 80px;
+}
+
+/* Prevent body scroll when totals sheet is open */
+body.ts-totals-open {
+  overflow: hidden;
+  position: fixed;
+  width: 100%;
+  height: 100%;
+}
+
+/* Responsive adjustments */
+@media (min-width: 768px) {
+  .totals-chip {
+    display: none;
+  }
+  
+  .totals-sheet {
+    position: relative;
+    bottom: auto;
+    max-height: none;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-sm);
+  }
+  
+  .wrap {
+    padding-bottom: 0;
+  }
+  
+  body.ts-totals-open {
+    overflow: auto;
+    position: static;
+    width: auto;
+    height: auto;
+  }
+}
+
 /* App Layout */
 #root {
   min-height: 100vh;
