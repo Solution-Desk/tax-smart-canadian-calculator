@@ -56,9 +56,13 @@ describe('taxMath', () => {
 
   // Edge cases
   it('should handle very small amounts', () => {
-    expect(calculateTax(0.01, 'ON')).toBeCloseTo(0.0013, 4);
-    expect(calculateTotal(0.01, 'ON')).toBeCloseTo(0.0113, 4);
-    expect(reverseTax(0.0113, 'ON')).toBeCloseTo(0.01, 2);
+    // 0.01 * 0.13 = 0.0013, but rounds to 0.00 (less than half a cent)
+    expect(calculateTax(0.01, 'ON')).toBe(0);
+    expect(calculateTotal(0.01, 'ON')).toBe(0.01);
+    // Test with slightly larger amount that will round
+    expect(calculateTax(0.10, 'ON')).toBe(0.01);
+    expect(calculateTotal(0.10, 'ON')).toBe(0.11);
+    expect(reverseTax(0.11, 'ON')).toBeCloseTo(0.10, 2);
   });
 
   it('should handle large amounts', () => {
