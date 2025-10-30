@@ -23,10 +23,11 @@ export default function Gate({ children, feature }: GateProps) {
           <li>✓ Create shareable links</li>
           <li>✓ Priority support</li>
         </ul>
-        <button 
-          className="btn-primary" 
-          onClick={startCheckout}
+        <button
+          className="btn-primary"
+          onClick={() => startCheckout().catch((error) => console.error('Checkout failed', error))}
           style={{ marginTop: '1rem' }}
+          type="button"
         >
           Go Pro
         </button>
